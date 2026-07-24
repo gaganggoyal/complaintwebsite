@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d2430">
+<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=yes">
 <title>Complaint.Website — आपकी शिकायत, हमारी ज़िम्मेदारी | An IndiaOffers.in Company</title>
 <meta name="description" content="Get your e-commerce, banking, telecom and insurance complaints resolved. 15+ years of complaint resolution experience. WhatsApp us at 9569608101. An IndiaOffers.in Company.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -311,7 +317,137 @@
   @keyframes wa-pulse{70%{box-shadow:0 0 0 16px rgba(37,211,102,0)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}}
   .wa-float:hover{filter:brightness(1.06);transform:translateY(-2px)}
   .wa-ico{display:inline-block;width:22px;height:22px}
-  @media(max-width:480px){.wa-float{padding:13px 16px;font-size:0}.wa-float .wa-ico{width:26px;height:26px}}
+
+  /* ---------- Mobile menu (hamburger + drawer) ---------- */
+  .nav-burger{
+    display:none;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;
+    background:#fff;align-items:center;justify-content:center;flex-direction:column;gap:5px;
+    cursor:pointer;padding:0;flex-shrink:0;-webkit-tap-highlight-color:transparent
+  }
+  .nav-burger span{display:block;width:18px;height:2px;border-radius:2px;background:var(--navy);transition:transform .2s ease,opacity .2s ease}
+  body.nav-open .nav-burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  body.nav-open .nav-burger span:nth-child(2){opacity:0}
+  body.nav-open .nav-burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav-drawer{
+    display:none;position:fixed;inset:0;z-index:80;pointer-events:none
+  }
+  .nav-drawer.open{display:block;pointer-events:auto}
+  .nav-drawer-backdrop{position:absolute;inset:0;background:rgba(13,36,48,.48);opacity:0;transition:opacity .25s ease}
+  .nav-drawer.open .nav-drawer-backdrop{opacity:1}
+  .nav-drawer-panel{
+    position:absolute;top:0;right:0;width:min(340px,88vw);height:100%;
+    background:#fff;box-shadow:-12px 0 40px rgba(0,0,0,.18);
+    transform:translateX(104%);transition:transform .28s cubic-bezier(.22,1,.36,1);
+    display:flex;flex-direction:column;padding:calc(16px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom));
+    overflow-y:auto;-webkit-overflow-scrolling:touch
+  }
+  .nav-drawer.open .nav-drawer-panel{transform:none}
+  .nav-drawer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .nav-drawer-top strong{font-family:var(--font-head);color:var(--navy);font-size:16px}
+  .nav-drawer-close{width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:22px;color:var(--navy);cursor:pointer;line-height:1}
+  .nav-drawer-links{display:flex;flex-direction:column;gap:4px}
+  .nav-drawer-links a{
+    display:flex;align-items:center;min-height:48px;padding:12px 14px;border-radius:14px;
+    text-decoration:none;color:var(--navy);font-weight:700;font-size:15.5px;background:#fbf7f1;border:1px solid transparent
+  }
+  .nav-drawer-links a:active,.nav-drawer-links a:hover{border-color:var(--line);background:#fff4ea;color:var(--saffron-dark)}
+  .nav-drawer-actions{margin-top:auto;padding-top:18px;display:grid;gap:10px}
+  .nav-drawer-actions .btn{width:100%;min-height:50px}
+  body.nav-open{overflow:hidden;touch-action:none}
+
+  /* ---------- Sticky mobile bottom bar ---------- */
+  .m-bottom{
+    display:none;position:fixed;left:0;right:0;bottom:0;z-index:90;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.92);backdrop-filter:blur(16px) saturate(160%);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);
+    border-top:1px solid rgba(237,224,208,.95);
+    box-shadow:0 -8px 28px rgba(40,28,16,.08)
+  }
+  .m-bottom-inner{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:560px;margin:0 auto}
+  .m-bottom .btn{min-height:48px;padding:12px 10px;font-size:14.5px;border-radius:14px}
+
+  /* ========== Mobile / app-like breakpoints ========== */
+  @media(max-width:1020px){
+    .nav-burger{display:inline-flex}
+    .nav-right .btn-cta{display:none}
+  }
+  @media(max-width:760px){
+    .m-bottom{display:block}
+    .wa-float{display:none!important} /* bottom bar replaces floating button */
+    footer{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+    body{padding-bottom:0}
+  }
+  @media(max-width:900px){
+    .wrap{padding:0 16px}
+    section{padding:56px 0}
+    section[id]{scroll-margin-top:76px}
+    .sec-title{margin-bottom:32px}
+    .sec-title h2{font-size:clamp(24px,6.5vw,32px)}
+    .sec-title p{font-size:15px}
+    .hero{padding:40px 0 48px}
+    .hero-orb{display:none} /* lighter paint on mobile */
+    .hero h1{font-size:clamp(28px,7.6vw,36px);letter-spacing:-.4px}
+    .hero p.lead{font-size:15.5px;margin-bottom:22px}
+    .hero-ctas{flex-direction:column;align-items:stretch;gap:10px}
+    .hero-ctas .btn{width:100%;min-height:52px}
+    .values-strip{font-size:11.5px;letter-spacing:.3px}
+    .values-strip span+span::before{margin:0 8px}
+    .chips{gap:7px}
+    .chip{padding:7px 12px;font-size:12px}
+    .chat-wrap{width:100%;max-width:100%}
+    .chat-card{max-width:100%;border-width:4px;border-radius:20px}
+    .chat-body{min-height:0;padding:14px 12px}
+    .stats-band{padding:28px 0}
+    .stat b{font-size:clamp(22px,6vw,30px)}
+    .stat small{font-size:12px}
+    .trust-row{gap:8px 14px}
+    .trust-row span{font-size:12.5px}
+    .card{padding:20px}
+    .card:hover{transform:none} /* avoid hover stick on touch */
+    .price-card{padding:30px 20px 24px}
+    .price-card .amount{font-size:40px}
+    .grid-3#pricing-grid,.pricing-grid{display:grid}
+    #pricing .grid-3{display:grid;gap:18px}
+    #pricing .grid-3 .popular{order:-1} /* best plan first on mobile */
+    .pay-cta{flex-direction:column}
+    .pay-cta .btn{width:100%;min-height:50px}
+    .pay-steps{padding:6px 14px}
+    .pay-steps li{font-size:14.2px;padding-left:48px}
+    .mission{padding:48px 0}
+    .mission .btn{width:100%;max-width:360px}
+    summary{padding:16px 16px;font-size:14.5px;min-height:52px}
+    details .ans{padding:0 16px 16px;font-size:14px}
+    .docs-note,.policy-box{padding:18px 16px}
+    .nav{padding:10px 0;gap:10px}
+    .logo-badge{width:40px;height:40px;border-radius:12px}
+    .logo-badge svg{width:23px;height:23px}
+    .logo-text b{font-size:17px}
+    .topbar .wrap{padding:7px 16px}
+  }
+  @media(max-width:560px){
+    .nav-right .nav-signin{display:none}
+    .logo-text span{display:none}
+    .hero-trust{gap:8px 12px}
+    .hero-trust span{font-size:12px}
+    .grid-4{grid-template-columns:1fr}
+    .steps .card{margin-top:8px}
+    .approach-card{padding:24px 18px}
+    footer{padding:40px 0 calc(120px + env(safe-area-inset-bottom))}
+  }
+  @media(max-width:380px){
+    .m-bottom .btn{font-size:13.5px;padding:12px 8px}
+    .hero-eyebrow{font-size:11.5px}
+  }
+  /* Touch: kill sticky hover lifts; keep active feedback */
+  @media(hover:none){
+    .card:hover,.about-card:hover,.chat-card:hover,.btn:hover{transform:none}
+    .btn:active{transform:scale(.98);filter:brightness(.98)}
+    .card:active{transform:scale(.995)}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .hero-orb,.wa-float::before,.tb-right .dot,.hero-eyebrow .dot{animation:none}
+  }
 </style>
 </head>
 <body>
@@ -359,9 +495,38 @@
       <a class="nav-signin l-hi" href="login.html">साइन इन</a>
       <a class="btn btn-cta l-en" href="register.html">Register Free</a>
       <a class="btn btn-cta l-hi" href="register.html">फ़्री रजिस्टर</a>
+      <button type="button" class="nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
+
+<!-- Mobile navigation drawer -->
+<div class="nav-drawer" id="navDrawer" hidden>
+  <div class="nav-drawer-backdrop" id="navBackdrop"></div>
+  <div class="nav-drawer-panel" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="nav-drawer-top">
+      <strong>complaint.website</strong>
+      <button type="button" class="nav-drawer-close" id="navClose" aria-label="Close menu">×</button>
+    </div>
+    <nav class="nav-drawer-links">
+      <a href="#approach"><span class="l-en">Our Approach</span><span class="l-hi">हमारा तरीका</span></a>
+      <a href="#services"><span class="l-en">What We Solve</span><span class="l-hi">हम क्या सुलझाते हैं</span></a>
+      <a href="#how"><span class="l-en">How It Works</span><span class="l-hi">कैसे काम करता है</span></a>
+      <a href="#genuine"><span class="l-en">Genuine Complaints</span><span class="l-hi">Genuine शिकायतें</span></a>
+      <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
+      <a href="#faq"><span class="l-en">FAQ</span><span class="l-hi">सवाल-जवाब</span></a>
+      <a href="login.html"><span class="l-en">Sign In</span><span class="l-hi">साइन इन</span></a>
+    </nav>
+    <div class="nav-drawer-actions">
+      <a class="btn btn-cta l-en" href="register.html">Register Free</a>
+      <a class="btn btn-cta l-hi" href="register.html">फ़्री रजिस्टर</a>
+      <a class="btn btn-wa l-en" href="https://wa.me/919569608101?text=Namaste!%20I%20need%20help%20with%20a%20complaint." target="_blank" rel="noopener">WhatsApp Us</a>
+      <a class="btn btn-wa l-hi" href="https://wa.me/919569608101?text=नमस्ते!%20मुझे%20अपनी%20शिकायत%20में%20मदद%20चाहिए।" target="_blank" rel="noopener">WhatsApp कीजिए</a>
+    </div>
+  </div>
+</div>
 <!-- ================= HERO ================= -->
 <section class="hero" id="top">
   <div class="hero-orb a" aria-hidden="true"></div>
@@ -904,7 +1069,7 @@
   </div>
 </footer>
 
-<!-- Floating WhatsApp button -->
+<!-- Floating WhatsApp (desktop/tablet) -->
 <a class="wa-float l-en" href="https://wa.me/919569608101?text=Namaste!%20I%20need%20help%20with%20a%20complaint." target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
   <svg class="wa-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.019-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
   WhatsApp Us
@@ -913,6 +1078,16 @@
   <svg class="wa-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.019-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
   WhatsApp करें
 </a>
+
+<!-- Sticky mobile action bar -->
+<div class="m-bottom" role="navigation" aria-label="Quick actions">
+  <div class="m-bottom-inner">
+    <a class="btn btn-cta l-en" href="register.html">Register Free</a>
+    <a class="btn btn-cta l-hi" href="register.html">फ़्री रजिस्टर</a>
+    <a class="btn btn-wa l-en" href="https://wa.me/919569608101?text=Namaste!%20I%20need%20help%20with%20a%20complaint." target="_blank" rel="noopener">WhatsApp</a>
+    <a class="btn btn-wa l-hi" href="https://wa.me/919569608101?text=नमस्ते!%20मुझे%20अपनी%20शिकायत%20में%20मदद%20चाहिए।" target="_blank" rel="noopener">WhatsApp</a>
+  </div>
+</div>
 
 <script>
   // Language toggle — remembers the visitor's choice
@@ -933,6 +1108,42 @@
     var onScroll = function(){ h.classList.toggle('scrolled', window.scrollY > 8); };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive:true });
+  })();
+
+  // Mobile nav drawer
+  (function(){
+    var burger = document.getElementById('navBurger');
+    var drawer = document.getElementById('navDrawer');
+    var backdrop = document.getElementById('navBackdrop');
+    var closeBtn = document.getElementById('navClose');
+    if(!burger || !drawer) return;
+    function openNav(){
+      drawer.hidden = false;
+      // force reflow so transition runs
+      void drawer.offsetWidth;
+      drawer.classList.add('open');
+      document.body.classList.add('nav-open');
+      burger.setAttribute('aria-expanded', 'true');
+      burger.setAttribute('aria-label', 'Close menu');
+    }
+    function closeNav(){
+      drawer.classList.remove('open');
+      document.body.classList.remove('nav-open');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.setAttribute('aria-label', 'Open menu');
+      setTimeout(function(){ if(!drawer.classList.contains('open')) drawer.hidden = true; }, 280);
+    }
+    burger.addEventListener('click', function(){
+      if(drawer.classList.contains('open')) closeNav(); else openNav();
+    });
+    if(backdrop) backdrop.addEventListener('click', closeNav);
+    if(closeBtn) closeBtn.addEventListener('click', closeNav);
+    drawer.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', closeNav);
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && drawer.classList.contains('open')) closeNav();
+    });
   })();
 
   // Reveal-on-scroll animation (stagger siblings in grids)

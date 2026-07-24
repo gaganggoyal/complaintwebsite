@@ -235,7 +235,77 @@ body.hi .l-en{display:none!important}
 
 .center-load{text-align:center;color:var(--muted);padding:40px 0;font-size:15px}
 
-@media(max-width:520px){
-  .auth-card{padding:28px 20px}
-  .auth-head h1{font-size:24px}
+/* ========== Mobile / touch optimization ========== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{-webkit-tap-highlight-color:rgba(255,122,51,.12)}
+button,a,.plan-opt{-webkit-tap-highlight-color:rgba(255,122,51,.12)}
+
+/* 16px inputs prevent iOS auto-zoom on focus */
+.field input,
+.otp-input{
+  font-size:16px;
+  min-height:48px;
 }
+.otp-input{
+  font-size:clamp(22px,7vw,30px);
+  letter-spacing:clamp(6px,3vw,14px);
+  min-height:56px;
+  padding:14px 8px;
+}
+.btn{min-height:50px}
+.lang-toggle button{min-height:36px;min-width:44px}
+.pw-toggle{min-height:44px;min-width:52px;padding:8px 10px}
+
+@media(max-width:640px){
+  .auth-wrap{padding:24px 14px calc(36px + env(safe-area-inset-bottom))}
+  .auth-wrap.wide{max-width:100%}
+  .auth-card{
+    padding:24px 16px;
+    border-radius:18px;
+    box-shadow:0 8px 28px rgba(40,28,16,.08);
+  }
+  .auth-head{margin-bottom:20px}
+  .auth-head h1{font-size:22px;letter-spacing:-.3px}
+  .auth-head p{font-size:14px}
+  .auth-header .bar{padding:10px 14px}
+  .logo-badge{width:38px;height:38px;border-radius:11px}
+  .logo-badge svg{width:22px;height:22px}
+  .logo-text b{font-size:16.5px}
+  .logo-text span{display:none}
+  .plan-opt .box{
+    padding:14px 12px;
+    column-gap:10px;
+    border-radius:14px;
+  }
+  .plan-opt .box .nm{font-size:14.5px}
+  .plan-opt .box .pr{font-size:14.5px}
+  .plan-opt .box .ds{font-size:12px}
+  .plan-opt:hover .box{transform:none}
+  .dash-hi{font-size:20px}
+  .plan-card{padding:20px 18px;border-radius:16px}
+  .plan-card .v{font-size:22px}
+  .dash-steps li{font-size:14px;padding-left:40px}
+  .foot-note{padding:16px 14px calc(20px + env(safe-area-inset-bottom));font-size:12px;line-height:1.5}
+}
+
+@media(max-width:380px){
+  .auth-card{padding:20px 14px}
+  .auth-head h1{font-size:20px}
+  .plan-opt .box{
+    grid-template-columns:auto 1fr;
+    grid-template-rows:auto auto auto;
+  }
+  .plan-opt .box::before{grid-row:1 / span 1;align-self:center}
+  .plan-opt .box .row{grid-column:2;grid-row:1}
+  .plan-opt .box .pr{grid-column:2;grid-row:2;justify-self:start}
+  .plan-opt .box .ds{grid-column:1 / -1;grid-row:3}
+}
+
+@media(hover:none){
+  .btn:hover{transform:none}
+  .btn:active{transform:scale(.98)}
+  .plan-opt:hover .box{transform:none}
+}
+
+/* Safe area for notched phones when header is sticky */
+.auth-header{padding-top:env(safe-area-inset-top)}
