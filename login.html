@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Complaint.Website | An IndiaOffers.in Company</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/auth.css">
+</head>
+<body>
+<script>if(localStorage.getItem('cw-lang')==='hi'){document.body.classList.add('hi');document.documentElement.lang='hi';}</script>
+<div class="tricolor"></div>
+<header class="auth-header">
+  <div class="bar">
+    <a class="logo" href="index.html">
+      <div class="logo-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.3 4.3 5.2v6c0 4.5 3.1 8.3 7.7 10.4 4.6-2.1 7.7-5.9 7.7-10.4v-6L12 2.3Z" fill="#fff" fill-opacity=".96"/><path d="m8.3 12 2.6 2.6 4.8-5.1" fill="none" stroke="#ec5f22" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="logo-text"><b>complaint<em>.website</em></b><span>An IndiaOffers.in Company</span></div>
+    </a>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" data-lang="en" class="on" onclick="setLang('en')">EN</button>
+      <button type="button" data-lang="hi" onclick="setLang('hi')">हिंदी</button>
+    </div>
+  </div>
+</header>
+
+<main class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <h1 class="l-en">Welcome back</h1><h1 class="l-hi">वापसी पर स्वागत है</h1>
+      <p class="l-en">Sign in to see your plan and activation status.</p>
+      <p class="l-hi">अपना plan और activation status देखने के लिए साइन इन कीजिए।</p>
+    </div>
+
+    <div id="logAlert" class="alert"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label class="l-en" for="logEmail">Email address</label><label class="l-hi" for="logEmail">ईमेल पता</label>
+        <input id="logEmail" name="email" type="email" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label class="l-en" for="logPassword">Password</label><label class="l-hi" for="logPassword">पासवर्ड</label>
+        <div class="pw-wrap">
+          <input id="logPassword" name="password" type="password" autocomplete="current-password" required>
+          <button type="button" class="pw-toggle" data-target="logPassword">Show</button>
+        </div>
+      </div>
+      <button id="logSubmit" type="submit" class="btn btn-cta"><span class="l-en">Sign in</span><span class="l-hi">साइन इन</span></button>
+    </form>
+
+    <div class="alt-link l-en">New here? <a href="register.html">Create an account</a></div>
+    <div class="alt-link l-hi">नए हैं? <a href="register.html">खाता बनाइए</a></div>
+  </div>
+</main>
+
+<div class="foot-note">
+  <span class="l-en">🔒 We never ask for OTP, PIN, card numbers or bank passwords. · <a href="index.html">Back to home</a></span>
+  <span class="l-hi">🔒 हम कभी OTP, PIN, card number या bank password नहीं माँगते। · <a href="index.html">होम पर वापस</a></span>
+</div>
+
+<script src="assets/auth.js"></script>
+<script>setLang(document.body.classList.contains('hi') ? 'hi' : 'en');</script>
+</body>
+</html>

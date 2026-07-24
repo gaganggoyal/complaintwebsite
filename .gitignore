@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# secrets & local environment (keep .env.example tracked)
+.env
+.env.local
+
+# database & runtime data
+server/data/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+# logs
+*.log
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
