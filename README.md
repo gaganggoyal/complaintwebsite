@@ -70,34 +70,36 @@ Open **http://localhost:3000** — this serves the marketing site AND the auth p
 
 ### Marking a customer "active" after payment
 
-The database is `server/data/app.db` (SQLite). After a customer pays, set their
-status to active, e.g. with the `sqlite3` CLI:
+Open **https://complaint.website/admin.html** and sign in with `ADMIN_PASSWORD`.
+The panel lists every signup with their plan, contact details and status. After
+a customer pays, click **✓ Mark active** — their dashboard badge switches to
+**Active** immediately.
 
-```
-sqlite3 server/data/app.db "UPDATE users SET plan_status='active' WHERE email='customer@example.com';"
-```
+The panel also lets you message a customer on WhatsApp (pre-filled with their
+plan), leave a private note against their account (e.g. "paid via UPI 27 Jul"),
+and delete test or spam signups.
 
-Their dashboard badge then shows **Active**. (A small admin screen can be added
-later if you want to avoid the command line.)
+If `ADMIN_PASSWORD` is blank the admin panel is switched off entirely, so it is
+never exposed behind an empty password.
 
 ---
 
-## Deploy
+## Deploying
 
-**Important:** because of the accounts system, the site now needs a **Node host**
-(not plain static hosting). Good free/cheap options: **Render**, **Railway**,
-**Fly.io**, a small **VPS**, or **cPanel "Setup Node.js App"**.
+The accounts system means this needs a **Node host**, not static hosting. Any
+VPS or Node platform works.
 
-On the host:
-- Run `npm install` then `npm start` in `server/` (start command: `node server.js`).
-- Set the environment variables from `.env` (SESSION_SECRET, SMTP_*, `NODE_ENV=production`).
-- `NODE_ENV=production` makes the login cookie HTTPS-only — so **enable HTTPS**
-  (essential for a login/accounts page anyway).
-- Point **complaint.website** at the host. Consider also pointing
-  **complaint.indiaoffers.in** at it — same trusted team, same WhatsApp number.
+- Run `npm ci --omit=dev` then `node server.js` in `server/`. If you deploy by
+  copying files, install dependencies **on the server** — `better-sqlite3` is a
+  native module and must be built for the target platform.
+- Set `NODE_ENV=production` and a real `SESSION_SECRET`.
+- Serve it over HTTPS; production sets the session cookie to HTTPS-only.
+- Put it behind a reverse proxy and don't expose the app port publicly.
+- Exclude `server/data` and `server/.env` from any file sync, so deploys never
+  overwrite the live database or secrets.
 
-The `server/` folder is never exposed on the web (source, `.env`, and the database
-are blocked), and `data/`, `node_modules/`, `.env` are git-ignored.
+Server addresses, paths and credentials are kept in private operational notes,
+not in this repository.
 
 ### Back up your data
 `server/data/app.db` holds every registration. Back it up regularly.
