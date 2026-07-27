@@ -88,7 +88,10 @@
 
   function enterPanel() {
     $('adminLogin').style.display = 'none';
-    $('adminApp').style.display = '';
+    // Must be an explicit value: #adminApp is hidden by a stylesheet rule (to
+    // avoid a flash before sign-in), and setting '' only clears an inline
+    // style — the rule would keep winning and leave the page blank.
+    $('adminApp').style.display = 'block';
     load();
   }
 
