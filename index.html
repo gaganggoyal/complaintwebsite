@@ -724,6 +724,27 @@
     .boss-grid{grid-template-columns:1fr;gap:34px}
     .boss-card{order:-1}
   }
+
+  /* ===== Free guides ===== */
+  .guides{background:#fff;border-top:1px solid var(--line)}
+  .guide-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .guide-card{display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--line);border-radius:18px;
+    padding:22px 20px;text-decoration:none;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+  .guide-card:hover{transform:translateY(-4px);border-color:var(--saffron);box-shadow:var(--shadow)}
+  .guide-card .ic{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,#fff7ef,#ffe8d4);
+    border:1px solid #f3ddc4;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px}
+  .guide-card b{display:block;color:var(--navy);font-family:var(--font-head);font-size:16px;line-height:1.35;
+    margin-bottom:7px;letter-spacing:-.2px}
+  .guide-card .d{color:var(--muted);font-size:13.5px;line-height:1.6;display:block}
+  .guides-more{margin-top:26px;text-align:center}
+  @media(max-width:1020px){.guide-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){
+    .guide-grid{grid-template-columns:1fr;gap:12px}
+    .guide-card{flex-direction:row;align-items:flex-start;gap:14px;padding:18px}
+    .guide-card .ic{flex:0 0 auto;width:40px;height:40px;margin-bottom:0;font-size:20px}
+    .guide-card .tx{min-width:0}
+    .guides-more .btn{width:100%}
+  }
 </style>
 </head>
 <body>
@@ -761,6 +782,7 @@
       <a href="#human"><span class="l-en">Human, not AI</span><span class="l-hi">इंसान, AI नहीं</span></a>
       <a href="#genuine"><span class="l-en">Genuine Complaints</span><span class="l-hi">Genuine शिकायतें</span></a>
       <a href="#boss"><span class="l-en">Complaint Boss</span><span class="l-hi">Complaint Boss</span></a>
+      <a href="guides/"><span class="l-en">Free Guides</span><span class="l-hi">मुफ़्त गाइड</span></a>
       <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
       <a href="#faq"><span class="l-en">FAQ</span><span class="l-hi">सवाल-जवाब</span></a>
     </nav>
@@ -799,6 +821,7 @@
       <a href="#human"><span class="l-en">Human, not AI</span><span class="l-hi">इंसान, AI नहीं</span></a>
       <a href="#genuine"><span class="l-en">Genuine Complaints</span><span class="l-hi">Genuine शिकायतें</span></a>
       <a href="#boss"><span class="l-en">Complaint Boss</span><span class="l-hi">Complaint Boss</span></a>
+      <a href="guides/"><span class="l-en">Free Guides</span><span class="l-hi">मुफ़्त गाइड</span></a>
       <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
       <a href="#faq"><span class="l-en">FAQ</span><span class="l-hi">सवाल-जवाब</span></a>
       <a href="login.html"><span class="l-en">Sign In</span><span class="l-hi">साइन इन</span></a>
@@ -1231,6 +1254,52 @@
 </section>
 
 <!-- ================= MISSION ================= -->
+<!-- ================= FREE GUIDES ================= -->
+<section id="guides" class="guides">
+  <div class="wrap">
+    <div class="sec-title reveal">
+      <span class="tag l-en">Free · no signup</span><span class="tag l-hi">मुफ़्त · बिना signup</span>
+      <h2 class="l-en">Do it yourself — here's exactly how</h2>
+      <h2 class="l-hi">ख़ुद करना चाहें — तरीक़ा यहाँ है</h2>
+      <p class="l-en">We would rather you win your case for free than not win it at all. These guides give you the same escalation ladder we use: who to write to, in what order, and by when.</p>
+      <p class="l-hi">हम चाहेंगे कि आप अपना मामला मुफ़्त में जीतें, बजाय इसके कि जीतें ही नहीं। इन गाइड में वही escalation सीढ़ी है जो हम इस्तेमाल करते हैं: किसे लिखें, किस क्रम में, और कब तक।</p>
+    </div>
+    <div class="guide-grid">
+      <a class="guide-card reveal" href="guides/refund-not-received.html">
+        <span class="ic">🛒</span>
+        <span class="tx"><b class="l-en">Refund not received from an online order</b>
+        <b class="l-hi">Online order का refund नहीं मिला</b>
+        <span class="d l-en">The grievance officer nobody writes to, and the 48-hour rule.</span>
+        <span class="d l-hi">वह grievance officer जिसे कोई नहीं लिखता, और 48 घंटे का नियम।</span></span>
+      </a>
+      <a class="guide-card reveal d1" href="guides/money-debited-payment-failed.html">
+        <span class="ic">💳</span>
+        <span class="tx"><b class="l-en">Money debited but payment failed</b>
+        <b class="l-hi">पैसा कट गया पर payment fail</b>
+        <span class="d l-en">RBI's reversal deadline — and ₹100 a day if the bank is late.</span>
+        <span class="d l-hi">RBI की वापसी समय-सीमा — और बैंक की देरी पर रोज़ ₹100।</span></span>
+      </a>
+      <a class="guide-card reveal d2" href="guides/banking-ombudsman-complaint.html">
+        <span class="ic">🏦</span>
+        <span class="tx"><b class="l-en">Complaining to the RBI Ombudsman</b>
+        <b class="l-hi">RBI Ombudsman से शिकायत</b>
+        <span class="d l-en">Free, online, no lawyer — after the 30-day rule is met.</span>
+        <span class="d l-hi">मुफ़्त, online, बिना वकील — 30-दिन का नियम पूरा होने के बाद।</span></span>
+      </a>
+      <a class="guide-card reveal d3" href="guides/insurance-claim-rejected.html">
+        <span class="ic">🛡️</span>
+        <span class="tx"><b class="l-en">Insurance claim rejected</b>
+        <b class="l-hi">बीमा claim ख़ारिज</b>
+        <span class="d l-en">The one document to insist on before you argue anything.</span>
+        <span class="d l-hi">बहस से पहले वह एक document जिस पर ज़ोर देना है।</span></span>
+      </a>
+    </div>
+    <div class="guides-more reveal">
+      <a class="btn btn-outline" href="guides/"><span class="l-en">See all guides →</span><span class="l-hi">सभी गाइड देखिए →</span></a>
+    </div>
+  </div>
+</section>
+
 <section class="mission">
   <div class="wrap">
     <h2 class="l-en">Our mission: har shikayat ki sunwai.<br>Every Indian consumer's complaint — heard and answered.</h2>
@@ -1471,6 +1540,7 @@
         <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
         <a href="#faq"><span class="l-en">FAQ</span><span class="l-hi">सवाल-जवाब</span></a>
         <a href="#boss"><span class="l-en">Complaint Boss</span><span class="l-hi">Complaint Boss</span></a>
+        <a href="guides/"><span class="l-en">Free Complaint Guides</span><span class="l-hi">मुफ़्त शिकायत गाइड</span></a>
         <a href="#terms"><span class="l-en">Terms &amp; Privacy</span><span class="l-hi">Terms और Privacy</span></a>
       </div>
       <div>

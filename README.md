@@ -18,6 +18,7 @@ No payment details are ever collected on the website.
 | Customer pages | `register.html`, `verify.html`, `login.html`, `dashboard.html` |
 | Admin panel | `admin.html` — review signups, activate customers after payment |
 | Installable app | `manifest.webmanifest`, `sw.js`, `offline.html`, `assets/pwa.js` |
+| Complaint guides | `guides/` — free how-to pages, the site's organic search surface |
 | Brand assets | `assets/brand/` — icons, social card, and the script that builds them |
 
 The auth pages call the server's `/api/...` endpoints, so they need it running.
@@ -64,13 +65,48 @@ stale-while-revalidate. Bump `CACHE_VERSION` when the precache list changes.
 Serve `sw.js` and `manifest.webmanifest` with `Cache-Control: no-cache`. A
 hard-cached worker is the one file a later deploy cannot fix.
 
+## Complaint guides
+
+`guides/` holds free, bilingual how-to pages — one per question people actually
+type into a search engine ("refund not received", "money debited but payment
+failed", "how to complain to the banking ombudsman", "insurance claim
+rejected"). A one-page site can rank for one thing; these are what give it a
+surface. Each converts to registration at the foot of the article.
+
+They share `assets/guide.css` and `assets/guide.js` and are otherwise plain
+standalone files — no build step, so a deploy stays an `rsync`.
+
+**Adding a guide.** Copy the closest existing one and change the content, then:
+
+1. Update `<title>`, description, `<link rel="canonical">` and the Open Graph
+   and Twitter tags to the new URL.
+2. Update all three JSON-LD blocks — breadcrumb, `Article`, and the `FAQPage`,
+   which must match the questions actually on the page.
+3. Add it to `sitemap.xml`, to `guides/index.html`, and to the `#guides` grid
+   on the homepage.
+4. Cross-link it from the related-guides block of its neighbours.
+
+**Writing rules that matter here.** Never state a company's grievance email
+address or a regulator's monetary limit as settled fact — those change, and a
+wrong one in print is worse than no page at all. Describe *where* to find the
+current value instead. Keep the legal-information disclaimer in the footer.
+
+`assets/guide.js` is deliberately separate from `assets/auth.js`: the latter
+drives the dashboard and redirects to the login page on a 401, which would be a
+disaster on a page someone reached from a search result.
+
 ## Search engines
 
 `sitemap.xml` and `robots.txt` sit at the project root; the sitemap URL is
-declared in `robots.txt`. The homepage carries Open Graph and Twitter card tags,
-a canonical URL, and JSON-LD covering the organisation, the service and its
-plans, and the FAQ. Keep the FAQ JSON-LD in step with the visible FAQ — Google
-treats a mismatch as structured-data spam.
+declared in `robots.txt`. Every page carries Open Graph and Twitter card tags,
+a canonical URL, and JSON-LD — the homepage covers the organisation, the service
+and its plans, and the FAQ; the guides add breadcrumbs and `Article`. Keep FAQ
+JSON-LD in step with the visible FAQ; Google treats a mismatch as
+structured-data spam.
+
+Bilingual headings use one element with `.l-en` / `.l-hi` spans inside, never
+two sibling headings. Two headings sharing an `id` is invalid — anchors and the
+scrollspy both break — and two `<h1>`s split the page's own title signal.
 
 Regenerate icons and the social card after a brand change:
 
