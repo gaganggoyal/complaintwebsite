@@ -18,10 +18,16 @@ const mode = hasResend ? 'resend' : (hasSmtp ? 'smtp' : 'dev');
 
 let transporter = null;
 if (!hasResend && hasSmtp) {
+  // secure=true  -> implicit TLS (port 465)
+  // secure=false -> STARTTLS (port 587, what Brevo recommends). requireTLS
+  // makes the upgrade mandatory, so credentials can never cross in plaintext
+  // if the server fails to advertise STARTTLS.
+  const secure = String(process.env.SMTP_SECURE || 'true') !== 'false';
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: Number(process.env.SMTP_PORT || 465),
-    secure: String(process.env.SMTP_SECURE || 'true') !== 'false',
+    secure,
+    requireTLS: !secure,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
   });
 }
