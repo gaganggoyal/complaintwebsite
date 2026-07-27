@@ -155,15 +155,20 @@
         '<td class="sub2 mono">' + esc(fmtDate(u.created_at)) + '</td>' +
         '<td><input class="note-in" type="text" placeholder="Add note…" value="' + esc(u.admin_note || '') + '"></td>' +
         '<td><div class="act">' +
-          '<button class="mini ' + (isActive ? 'un' : 'go') + '">' + (isActive ? 'Mark pending' : '✓ Mark active') + '</button>' +
+          '<button class="mini js-toggle ' + (isActive ? 'un' : 'go') + '">' + (isActive ? 'Mark pending' : '✓ Mark active') + '</button>' +
+          // Only offered while the address is unconfirmed — that is the one
+          // case where the customer is stuck and cannot proceed.
+          (!u.email_verified ? '<button class="mini js-resend send">✉ Resend email</button>' : '') +
           '<a class="mini wa" target="_blank" rel="noopener" href="' + esc(waLink(u)) + '">WhatsApp</a>' +
-          '<button class="mini del">Delete</button>' +
+          '<button class="mini js-del del">Delete</button>' +
         '</div></td>';
 
       // --- wire up actions ---
-      var buttons = tr.querySelectorAll('button');
-      var toggleBtn = buttons[0];
-      var delBtn = buttons[1];
+      // Selected by class, not position: adding a button would otherwise
+      // shift the indices and wire the wrong handler to the wrong control.
+      var toggleBtn = tr.querySelector('.js-toggle');
+      var delBtn = tr.querySelector('.js-del');
+      var resendBtn = tr.querySelector('.js-resend');
       var noteInput = tr.querySelector('.note-in');
 
       toggleBtn.addEventListener('click', async function () {
@@ -173,6 +178,31 @@
         if (out.ok) { load(); }
         else { show($('listAlert'), out.data.error || 'Could not update status.'); toggleBtn.disabled = false; }
       });
+
+      if (resendBtn) {
+        resendBtn.addEventListener('click', async function () {
+          hide($('listAlert'));
+          resendBtn.disabled = true;
+          var label = resendBtn.textContent;
+          resendBtn.textContent = 'Sending…';
+
+          var out = await api('/api/admin/resend-verification', { id: u.id });
+
+          if (out.ok && out.data.ok) {
+            show($('listAlert'), 'Verification email sent to ' + u.email + '.', 'ok');
+            resendBtn.textContent = '✓ Sent';
+            // Leave it disabled briefly so a double-click cannot fire twice.
+            setTimeout(function () {
+              resendBtn.disabled = false;
+              resendBtn.textContent = label;
+            }, 4000);
+          } else {
+            show($('listAlert'), out.data.error || 'Could not send the email.');
+            resendBtn.disabled = false;
+            resendBtn.textContent = label;
+          }
+        });
+      }
 
       delBtn.addEventListener('click', async function () {
         if (!confirm('Delete ' + u.name + ' (' + u.email + ')? This cannot be undone.')) return;

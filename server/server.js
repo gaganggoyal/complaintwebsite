@@ -408,6 +408,40 @@ app.post('/api/admin/status', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+// Resend the verification email to a customer who never confirmed theirs.
+// Deliberately ignores the 45s customer-facing resend cooldown: this is a
+// trusted operator acting on a support request, not the public endpoint.
+app.post('/api/admin/resend-verification', requireAdmin, async (req, res) => {
+  try {
+    const id = parseInt(req.body && req.body.id, 10);
+    if (!id) return res.status(400).json({ error: 'Missing user id.' });
+
+    const user = db.getUserById(id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    if (user.email_verified) {
+      return res.status(400).json({ error: 'This email is already verified.' });
+    }
+
+    const otp = genOtp();
+    const otpHash = await bcrypt.hash(otp, 10);
+    const now = Date.now();
+    db.setOtp(user.email, otpHash, now + OTP_TTL, now);
+
+    try {
+      await sendOtpEmail(user.email, user.name, otp, issueVerifyLink(user.email, now + OTP_TTL));
+    } catch (mailErr) {
+      console.error('admin resend: email delivery failed:', mailErr);
+      return res.status(502).json({ error: 'Could not send the email just now. Please try again in a moment.' });
+    }
+
+    console.log(`admin: resent verification to ${user.email}`);
+    return res.json({ ok: true, email: user.email });
+  } catch (e) {
+    console.error('admin resend error:', e);
+    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
+});
+
 app.post('/api/admin/note', requireAdmin, (req, res) => {
   const id = parseInt(req.body && req.body.id, 10);
   const note = String((req.body && req.body.note) || '').slice(0, 500);
