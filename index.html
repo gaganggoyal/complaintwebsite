@@ -448,6 +448,44 @@
   @media(prefers-reduced-motion:reduce){
     .hero-orb,.wa-float::before,.tb-right .dot,.hero-eyebrow .dot{animation:none}
   }
+  /* ===== Complaint Boss — YouTube ===== */
+  .boss{background:linear-gradient(180deg,#fff,var(--bg));border-top:1px solid var(--line)}
+  .boss-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  .boss-eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fdeceb;color:#c4302b;font-weight:800;font-size:12px;letter-spacing:1.3px;text-transform:uppercase;padding:7px 15px;border-radius:100px;margin-bottom:16px}
+  .boss-eyebrow .yt{width:17px;height:12px;background:#c4302b;border-radius:3px;position:relative;flex:0 0 auto}
+  .boss-eyebrow .yt::after{content:"";position:absolute;left:6px;top:3px;border-left:5px solid #fff;border-top:3px solid transparent;border-bottom:3px solid transparent}
+  .boss h2{font-size:clamp(26px,3.4vw,38px);color:var(--navy);letter-spacing:-.5px;font-weight:800;margin-bottom:12px}
+  .boss h2 .hl{color:var(--saffron-dark)}
+  .boss .lead{color:var(--muted);font-size:16.5px;line-height:1.75;margin-bottom:22px}
+  .boss-list{display:flex;flex-direction:column;gap:13px;margin-bottom:24px}
+  .boss-item{display:flex;gap:12px;align-items:flex-start}
+  .boss-item .ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:linear-gradient(145deg,#fff1e4,#ffe1c9);display:flex;align-items:center;justify-content:center;font-size:16px}
+  .boss-item b{display:block;color:var(--navy);font-size:15px;margin-bottom:2px}
+  .boss-item span{color:var(--muted);font-size:14.5px;line-height:1.6}
+  .boss-tie{background:#fff;border:1px solid var(--line);border-left:4px solid var(--saffron);border-radius:0 16px 16px 0;padding:16px 20px;margin-bottom:24px;box-shadow:var(--shadow)}
+  .boss-tie p{color:var(--ink);font-size:15px;line-height:1.7;margin:0}
+  .boss-ctas{display:flex;gap:12px;flex-wrap:wrap}
+  .btn-yt{background:#c4302b;color:#fff;box-shadow:0 8px 22px rgba(196,48,43,.32)}
+  .boss-note{margin-top:16px;color:var(--muted);font-size:13.5px}
+
+  /* channel card */
+  .boss-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lg);overflow:hidden}
+  .boss-thumb{position:relative;aspect-ratio:16/9;background:radial-gradient(600px 300px at 70% 10%,rgba(255,122,51,.35),transparent 60%),linear-gradient(160deg,#1f4d5e,var(--navy-dark));display:flex;align-items:center;justify-content:center}
+  .boss-play{width:70px;height:70px;border-radius:50%;background:#c4302b;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(196,48,43,.5)}
+  .boss-play::after{content:"";border-left:22px solid #fff;border-top:13px solid transparent;border-bottom:13px solid transparent;margin-left:6px}
+  .boss-thumb-tag{position:absolute;left:16px;top:16px;background:rgba(255,255,255,.16);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:100px;backdrop-filter:blur(6px)}
+  .boss-meta{display:flex;gap:13px;align-items:center;padding:18px 20px}
+  .boss-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,var(--saffron),var(--saffron-dark));display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 5px 14px rgba(236,95,34,.35)}
+  .boss-avatar svg{width:27px;height:27px}
+  .boss-meta b{display:block;color:var(--navy);font-size:17px;font-weight:800;letter-spacing:-.2px}
+  .boss-meta span{color:var(--muted);font-size:13px}
+  .boss-sub{margin:0 20px 20px;display:block;text-align:center;background:#c4302b;color:#fff;font-weight:800;padding:13px;border-radius:14px;text-decoration:none;font-size:15px;transition:filter .18s ease}
+  .boss-sub:hover{filter:brightness(1.08)}
+
+  @media(max-width:900px){
+    .boss-grid{grid-template-columns:1fr;gap:34px}
+    .boss-card{order:-1}
+  }
 </style>
 </head>
 <body>
@@ -483,6 +521,7 @@
       <a href="#services"><span class="l-en">What We Solve</span><span class="l-hi">हम क्या सुलझाते हैं</span></a>
       <a href="#how"><span class="l-en">How It Works</span><span class="l-hi">कैसे काम करता है</span></a>
       <a href="#genuine"><span class="l-en">Genuine Complaints</span><span class="l-hi">Genuine शिकायतें</span></a>
+      <a href="#boss"><span class="l-en">Complaint Boss</span><span class="l-hi">Complaint Boss</span></a>
       <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
       <a href="#faq"><span class="l-en">FAQ</span><span class="l-hi">सवाल-जवाब</span></a>
     </nav>
@@ -515,6 +554,7 @@
       <a href="#services"><span class="l-en">What We Solve</span><span class="l-hi">हम क्या सुलझाते हैं</span></a>
       <a href="#how"><span class="l-en">How It Works</span><span class="l-hi">कैसे काम करता है</span></a>
       <a href="#genuine"><span class="l-en">Genuine Complaints</span><span class="l-hi">Genuine शिकायतें</span></a>
+      <a href="#boss"><span class="l-en">Complaint Boss</span><span class="l-hi">Complaint Boss</span></a>
       <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
       <a href="#faq"><span class="l-en">FAQ</span><span class="l-hi">सवाल-जवाब</span></a>
       <a href="login.html"><span class="l-en">Sign In</span><span class="l-hi">साइन इन</span></a>
@@ -558,6 +598,8 @@
         <span class="chip l-hi">✔ सिर्फ़ genuine शिकायतें</span>
         <span class="chip l-en">✔ Hindi + English support</span>
         <span class="chip l-hi">✔ हिंदी + English support</span>
+        <span class="chip l-en">▶ Complaint Boss on YouTube</span>
+        <span class="chip l-hi">▶ YouTube पर Complaint Boss</span>
       </div>
       <div class="hero-trust l-en">
         <span><i>🔒</i> No OTP / PIN ever asked</span>
@@ -802,8 +844,8 @@
     <div class="about-grid">
       <div class="about-card">
         <h3 class="l-en">🏦 We know how companies work inside</h3><h3 class="l-hi">🏦 हम जानते हैं कंपनियाँ अंदर से कैसे काम करती हैं</h3>
-        <p class="l-en">With 15+ years of hands-on complaint resolution experience in the e-commerce and banking sectors, we know exactly how complaints are processed internally — which complaints get closed with a template reply, and which ones get genuine action. We write yours to be the second kind.</p>
-        <p class="l-hi">E-commerce और banking सेक्टर में 15+ साल के hands-on complaint resolution अनुभव से हमें ठीक-ठीक पता है कि शिकायतें अंदर कैसे process होती हैं — कौन-सी template reply से बंद कर दी जाती हैं और किन पर सच में action होता है। आपकी शिकायत हम दूसरी वाली बनाते हैं।</p>
+        <p class="l-en">With 15+ years of hands-on complaint resolution experience in the e-commerce and banking sectors, we know exactly how complaints are processed internally — which complaints get closed with a template reply, and which ones get genuine action. We write yours to be the second kind. You can see that experience for yourself on <a href="#boss" style="color:var(--gold);font-weight:700">Complaint Boss</a>, our YouTube channel.</p>
+        <p class="l-hi">E-commerce और banking सेक्टर में 15+ साल के hands-on complaint resolution अनुभव से हमें ठीक-ठीक पता है कि शिकायतें अंदर कैसे process होती हैं — कौन-सी template reply से बंद कर दी जाती हैं और किन पर सच में action होता है। आपकी शिकायत हम दूसरी वाली बनाते हैं। यह अनुभव आप ख़ुद हमारे YouTube चैनल <a href="#boss" style="color:var(--gold);font-weight:700">Complaint Boss</a> पर देख सकते हैं।</p>
       </div>
       <div class="about-card">
         <h3 class="l-en">🎯 The right email ID changes everything</h3><h3 class="l-hi">🎯 सही email ID सब कुछ बदल देती है</h3>
@@ -815,6 +857,80 @@
         <p class="l-en">If your case is weak, we will tell you before you spend a single rupee. If a free government channel (Consumer Helpline, Ombudsman) is your best option, we will point you there and help you use it. Your trust is worth more to us than any fee.</p>
         <p class="l-hi">अगर आपका case कमज़ोर है, तो एक रुपया खर्च होने से पहले हम बता देंगे। अगर कोई मुफ़्त सरकारी रास्ता (Consumer Helpline, Ombudsman) आपके लिए बेहतर है, तो हम वहीं भेजेंगे और इस्तेमाल में मदद भी करेंगे। आपका भरोसा हमारे लिए किसी भी fee से बड़ा है।</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COMPLAINT BOSS — YOUTUBE ================= -->
+<section id="boss" class="boss">
+  <div class="wrap boss-grid">
+    <div>
+      <div class="boss-eyebrow"><span class="yt"></span><span class="l-en">New on YouTube</span><span class="l-hi">अब YouTube पर</span></div>
+      <h2 class="l-en">Meet <span class="hl">Complaint Boss</span></h2>
+      <h2 class="l-hi">मिलिए <span class="hl">Complaint Boss</span> से</h2>
+      <p class="lead l-en">The 15+ years of experience behind your complaint — now on camera. Complaint Boss is the same person who drafts and escalates your case, breaking down how consumer complaints really get resolved in India.</p>
+      <p class="lead l-hi">आपकी शिकायत के पीछे का 15+ साल का अनुभव — अब कैमरे पर। Complaint Boss वही हैं जो आपकी शिकायत तैयार करके escalate करते हैं, और चैनल पर बताते हैं कि भारत में उपभोक्ता शिकायतें असल में कैसे हल होती हैं।</p>
+
+      <div class="boss-list">
+        <div class="boss-item">
+          <div class="ic">📩</div>
+          <div>
+            <b class="l-en">Which email actually gets read</b><b class="l-hi">कौन-सी email सच में पढ़ी जाती है</b>
+            <span class="l-en">Nodal officers, grievance cells and escalation desks — and why customer care is where complaints go to die.</span>
+            <span class="l-hi">Nodal officer, grievance cell और escalation desk — और क्यों customer care में शिकायतें दम तोड़ देती हैं।</span>
+          </div>
+        </div>
+        <div class="boss-item">
+          <div class="ic">⚖️</div>
+          <div>
+            <b class="l-en">The rights you already have</b><b class="l-hi">आपके पास पहले से मौजूद अधिकार</b>
+            <span class="l-en">What consumer law entitles you to, explained in plain Hindi and English — no legal jargon.</span>
+            <span class="l-hi">उपभोक्ता क़ानून आपको क्या देता है, आसान हिंदी और English में — बिना क़ानूनी शब्दजाल के।</span>
+          </div>
+        </div>
+        <div class="boss-item">
+          <div class="ic">🧾</div>
+          <div>
+            <b class="l-en">Real cases, start to finish</b><b class="l-hi">असली case, शुरू से आख़िर तक</b>
+            <span class="l-en">How an ignored complaint became a refund — what was written, where it was sent, and how long it took.</span>
+            <span class="l-hi">एक अनसुनी शिकायत refund कैसे बनी — क्या लिखा गया, कहाँ भेजा गया, और कितना समय लगा।</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="boss-tie">
+        <p class="l-en"><b>Registering connects you to Complaint Boss directly.</b> You are not watching from the outside — the same playbook you see on the channel is applied to your own complaint, by the same person, with the escalation contacts and follow-up that members get.</p>
+        <p class="l-hi"><b>रजिस्टर करते ही आप सीधे Complaint Boss से जुड़ जाते हैं।</b> आप सिर्फ़ बाहर से देखने वाले नहीं रहते — चैनल पर दिखने वाला वही तरीक़ा, वही इंसान, आपकी अपनी शिकायत पर लगाता है — escalation contacts और follow-up के साथ।</p>
+      </div>
+
+      <div class="boss-ctas">
+        <a class="btn btn-yt l-en" href="https://www.youtube.com/@ComplaintBoss" target="_blank" rel="noopener">▶ Subscribe on YouTube</a>
+        <a class="btn btn-yt l-hi" href="https://www.youtube.com/@ComplaintBoss" target="_blank" rel="noopener">▶ YouTube पर Subscribe कीजिए</a>
+        <a class="btn btn-cta l-en" href="register.html">Register Free →</a>
+        <a class="btn btn-cta l-hi" href="register.html">फ़्री रजिस्टर →</a>
+      </div>
+      <p class="boss-note l-en">The channel is brand new — subscribe now and the first episodes reach you as they go live.</p>
+      <p class="boss-note l-hi">चैनल बिलकुल नया है — अभी subscribe कीजिए, पहले episodes आते ही आप तक पहुँचेंगे।</p>
+    </div>
+
+    <div class="boss-card">
+      <div class="boss-thumb">
+        <span class="boss-thumb-tag l-en">Launching now</span>
+        <span class="boss-thumb-tag l-hi">अभी शुरू</span>
+        <div class="boss-play" aria-hidden="true"></div>
+      </div>
+      <div class="boss-meta">
+        <div class="boss-avatar" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 2.3 4.3 5.2v6c0 4.5 3.1 8.3 7.7 10.4 4.6-2.1 7.7-5.9 7.7-10.4v-6L12 2.3Z" fill="#fff" fill-opacity=".96"/><path d="m8.3 12 2.6 2.6 4.8-5.1" fill="none" stroke="#ec5f22" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <b>Complaint Boss</b>
+          <span class="l-en">Consumer complaints · हिंदी + English</span>
+          <span class="l-hi">उपभोक्ता शिकायतें · हिंदी + English</span>
+        </div>
+      </div>
+      <a class="boss-sub l-en" href="https://www.youtube.com/@ComplaintBoss" target="_blank" rel="noopener">Subscribe</a>
+      <a class="boss-sub l-hi" href="https://www.youtube.com/@ComplaintBoss" target="_blank" rel="noopener">Subscribe कीजिए</a>
     </div>
   </div>
 </section>
@@ -1054,11 +1170,13 @@
         <a href="#how"><span class="l-en">How It Works</span><span class="l-hi">कैसे काम करता है</span></a>
         <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
         <a href="#faq"><span class="l-en">FAQ</span><span class="l-hi">सवाल-जवाब</span></a>
+        <a href="#boss"><span class="l-en">Complaint Boss</span><span class="l-hi">Complaint Boss</span></a>
         <a href="#terms"><span class="l-en">Terms &amp; Privacy</span><span class="l-hi">Terms और Privacy</span></a>
       </div>
       <div>
         <h4 class="l-en">Contact</h4><h4 class="l-hi">संपर्क</h4>
         <a href="https://wa.me/919569608101" target="_blank" rel="noopener">📲 WhatsApp: 95696 08101</a>
+        <a href="https://www.youtube.com/@ComplaintBoss" target="_blank" rel="noopener">▶ YouTube: Complaint Boss</a>
         <a href="https://indiaoffers.in" target="_blank" rel="noopener">🌐 IndiaOffers.in</a>
         <p class="l-en" style="margin-top:10px;font-size:12.5px">Service hours: 10 AM – 8 PM, Mon–Sat.<br>Messages received after hours are answered the next working day.</p>
         <p class="l-hi" style="margin-top:10px;font-size:12.5px">Service समय: सुबह 10 – रात 8, सोम–शनि।<br>समय के बाद आए messages का जवाब अगले working day मिलता है।</p>

@@ -201,6 +201,21 @@ body.hi .l-en{display:none!important}
 /* alerts */
 .alert{border-radius:14px;padding:12px 15px;font-size:14px;margin-bottom:18px;display:none}
 .alert.show{display:block}
+/* Complaint Boss — YouTube */
+.boss-strip{display:flex;gap:11px;align-items:flex-start;background:#fdeceb;border:1px solid #f7d3d1;border-radius:14px;padding:13px 15px;margin-bottom:22px}
+.boss-strip .yt{flex:0 0 auto;width:20px;height:14px;background:#c4302b;border-radius:4px;position:relative;margin-top:2px}
+.boss-strip .yt::after{content:"";position:absolute;left:7px;top:3.5px;border-left:6px solid #fff;border-top:3.5px solid transparent;border-bottom:3.5px solid transparent}
+.boss-strip p{font-size:13.5px;line-height:1.6;color:#8a3a2c;margin:0}
+.boss-strip b{color:#6f2b20}
+
+.boss-dash{display:flex;gap:13px;align-items:center;background:#fdeceb;border:1px solid #f7d3d1;border-radius:16px;padding:15px 17px;margin-top:18px}
+.boss-dash .txt{flex:1;min-width:0}
+.boss-dash b{display:block;color:#6f2b20;font-size:14.5px;margin-bottom:2px}
+.boss-dash span{color:#8a3a2c;font-size:13px;line-height:1.55}
+.boss-dash a{flex:0 0 auto;background:#c4302b;color:#fff;font-weight:700;font-size:13.5px;padding:10px 16px;border-radius:11px;text-decoration:none;white-space:nowrap}
+.boss-dash a:hover{filter:brightness(1.08)}
+@media(max-width:520px){.boss-dash{flex-direction:column;align-items:stretch;text-align:center}.boss-dash a{text-align:center}}
+
 .alert.err{background:#fdf0ec;border:1px solid #f4cdbf;color:#b3402a}
 .alert.ok{background:#eef9f1;border:1px solid #c7e9d3;color:#177a41}
 .alert.info{background:#fff7ec;border:1px solid #f2ddba;color:#8a5a00}

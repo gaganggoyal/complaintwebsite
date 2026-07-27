@@ -24,6 +24,28 @@ const BRAND = {
 
 const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans','Noto Sans Devanagari',Arial,sans-serif";
 
+// The YouTube channel is the same person who works the customer's complaint,
+// so it belongs in the mails they read right after signing up.
+const YOUTUBE_URL = process.env.YOUTUBE_URL || 'https://www.youtube.com/@ComplaintBoss';
+
+function youtubeStrip() {
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:26px 0 0">
+      <tr>
+        <td style="background-color:#fdeceb;border:1px solid #f7d3d1;border-radius:14px;padding:16px 18px">
+          <div style="font-family:${FONT};font-size:14.5px;font-weight:700;color:#6f2b20">
+            ▶ Complaint Boss on YouTube
+          </div>
+          <div style="font-family:${FONT};font-size:13.5px;line-height:1.6;color:#8a3a2c;padding-top:4px">
+            See how complaints like yours actually get resolved — from the same
+            person handling your case.
+            <a href="${YOUTUBE_URL}" style="color:#c4302b;font-weight:700;text-decoration:none">Subscribe&nbsp;→</a>
+          </div>
+        </td>
+      </tr>
+    </table>`;
+}
+
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -270,7 +292,9 @@ function welcomeEmail({ name, planLabel, planPrice, waLink }) {
 
     <p style="margin:20px 0 0;font-family:${FONT};font-size:13px;line-height:1.65;color:${BRAND.muted};text-align:center">
       No payment is ever collected on this website.
-    </p>`;
+    </p>
+
+    ${youtubeStrip()}`;
 
   return {
     subject: 'Your email is verified — one step left',
@@ -289,6 +313,7 @@ function welcomeEmail({ name, planLabel, planPrice, waLink }) {
       `2. We reply with the exact amount and our official UPI QR.\n` +
       `3. Pay, send the screenshot, and we activate your plan.\n\n` +
       `No payment is ever collected on this website.\n\n` +
+      `Complaint Boss on YouTube — see how complaints like yours get resolved:\n${YOUTUBE_URL}\n\n` +
       `— complaint.website (An IndiaOffers.in Company)`
   };
 }
