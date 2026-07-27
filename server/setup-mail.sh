@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 # Interactively write Brevo (or any) SMTP credentials into server/.env.
 #
-# Run it on the server:   bash server/setup-mail.sh
+# Run it from the server's app directory:   bash server/setup-mail.sh
+#
+# Override the systemd unit and owner if yours differ:
+#   SERVICE=my-unit APP_USER=my-user bash server/setup-mail.sh
 #
 # The SMTP key is read with `read -s`, so it is never echoed to the screen and
 # never lands in your shell history.
 set -euo pipefail
 
-ENV_FILE="$(cd "$(dirname "$0")" && pwd)/.env"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ENV_FILE="$SCRIPT_DIR/.env"
 [ -f "$ENV_FILE" ] || { echo "No .env at $ENV_FILE"; exit 1; }
+
+# Deployment-specific; override via the environment rather than editing this.
+SERVICE="${SERVICE:-complaint}"
+APP_USER="${APP_USER:-}"
 
 echo "=== Brevo SMTP setup for complaint.website ==="
 echo
@@ -73,12 +81,17 @@ set_var MAIL_REPLY_TO "${REPLY_ADDR}"
 set_var RESEND_API_KEY ""   # keep empty so the SMTP path is the one used
 
 chmod 600 "$ENV_FILE"
-chown complaint:complaint "$ENV_FILE" 2>/dev/null || true
+[ -n "$APP_USER" ] && chown "$APP_USER:$APP_USER" "$ENV_FILE" 2>/dev/null
 
 echo
-echo "Saved. Restarting the service…"
-systemctl restart complaint
-sleep 2
-systemctl is-active complaint && journalctl -u complaint -n 3 --no-pager | tail -2
+if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files "$SERVICE.service" >/dev/null 2>&1; then
+  echo "Saved. Restarting $SERVICE…"
+  systemctl restart "$SERVICE"
+  sleep 2
+  systemctl is-active "$SERVICE" && journalctl -u "$SERVICE" -n 3 --no-pager | tail -2
+else
+  echo "Saved. Restart the app for the new settings to take effect."
+fi
+
 echo
-echo "Now send yourself a test:  node server/test-mail.js you@example.com"
+echo "Now send yourself a test:  node $SCRIPT_DIR/test-mail.js you@example.com"

@@ -4,6 +4,11 @@ node_modules/
 # secrets & local environment (keep .env.example tracked)
 .env
 .env.local
+.env.bak.*
+
+# private operational notes — server addresses, paths, credentials location.
+# This repository is public; these must never be committed.
+*.local.md
 
 # database & runtime data
 server/data/
