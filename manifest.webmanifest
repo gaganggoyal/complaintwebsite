@@ -1,0 +1,57 @@
+{
+  "id": "/",
+  "name": "Complaint.Website — India's complaint desk",
+  "short_name": "Complaint",
+  "description": "Get e-commerce, banking, telecom and insurance complaints resolved. A human expert writes your complaint — never AI.",
+  "start_url": "/?src=app",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#fbf5ec",
+  "theme_color": "#0d2430",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    { "src": "/assets/brand/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/brand/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/brand/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start a complaint",
+      "short_name": "Register",
+      "description": "Create an account and pick a plan",
+      "url": "/register.html?src=app"
+    },
+    {
+      "name": "My account",
+      "short_name": "Account",
+      "description": "Your plan and activation status",
+      "url": "/dashboard.html?src=app"
+    },
+    {
+      "name": "Pricing",
+      "short_name": "Pricing",
+      "description": "Plans from ₹9",
+      "url": "/?src=app#pricing"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/brand/screenshot-mobile.jpg",
+      "sizes": "390x844",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Complaint.Website on mobile"
+    },
+    {
+      "src": "/assets/brand/screenshot-wide.jpg",
+      "sizes": "1280x800",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Complaint.Website on desktop"
+    }
+  ]
+}

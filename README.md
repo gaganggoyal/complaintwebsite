@@ -17,6 +17,8 @@ No payment details are ever collected on the website.
 | Accounts app | `server/` — Node/Express: registration, email confirmation, login |
 | Customer pages | `register.html`, `verify.html`, `login.html`, `dashboard.html` |
 | Admin panel | `admin.html` — review signups, activate customers after payment |
+| Installable app | `manifest.webmanifest`, `sw.js`, `offline.html`, `assets/pwa.js` |
+| Brand assets | `assets/brand/` — icons, social card, and the script that builds them |
 
 The auth pages call the server's `/api/...` endpoints, so they need it running.
 
@@ -33,8 +35,48 @@ The auth pages call the server's `/api/...` endpoints, so they need it running.
 - **Transactional email** — verification, "email confirmed", and "plan activated"
   messages, table-based and inline-styled so they render intact in Outlook and
   Gmail, each with a plain-text alternative.
+- **Installable** — meets the browser install criteria, so Android and desktop
+  offer "Install app" and iOS Safari can add it to the home screen. Runs
+  full-screen with its own icon and splash screen.
+- **Works offline** — a service worker serves pages network-first and keeps the
+  last good copy, so a dropped connection shows the site rather than a browser
+  error page. API calls are never cached.
 - **No payment handling** — activation happens over WhatsApp, so the site never
   touches card or UPI data.
+
+## Installable app (PWA)
+
+| File | Role |
+|---|---|
+| `manifest.webmanifest` | Name, icons, colours, shortcuts — what the installed app looks like |
+| `sw.js` | Caching strategy and the offline fallback |
+| `offline.html` | Shown only if a page is requested that was never cached |
+| `assets/pwa.js` | Registers the worker and drives the install prompt |
+
+Any element with `class="js-install" hidden` becomes an install button — the
+script reveals it only when the browser can genuinely install, and falls back to
+Add-to-Home-Screen instructions on iOS Safari, which has no install API.
+
+**Caching rules**, in `sw.js`: `/api/*` is never cached; page navigations are
+network-first so a deploy is live immediately; static assets are
+stale-while-revalidate. Bump `CACHE_VERSION` when the precache list changes.
+
+Serve `sw.js` and `manifest.webmanifest` with `Cache-Control: no-cache`. A
+hard-cached worker is the one file a later deploy cannot fix.
+
+## Search engines
+
+`sitemap.xml` and `robots.txt` sit at the project root; the sitemap URL is
+declared in `robots.txt`. The homepage carries Open Graph and Twitter card tags,
+a canonical URL, and JSON-LD covering the organisation, the service and its
+plans, and the FAQ. Keep the FAQ JSON-LD in step with the visible FAQ — Google
+treats a mismatch as structured-data spam.
+
+Regenerate icons and the social card after a brand change:
+
+```bash
+bash assets/brand/build-icons.sh    # needs librsvg + imagemagick
+```
 
 ## Requirements
 

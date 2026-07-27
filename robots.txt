@@ -1,0 +1,13 @@
+# complaint.website
+#
+# Everything public is crawlable. The account pages carry a <meta name="robots"
+# content="noindex"> tag instead of being blocked here — a crawler has to be
+# able to fetch a page to see that tag, so disallowing them would leave bare
+# URLs eligible to appear in results with no way to drop them.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /offline.html
+
+Sitemap: https://complaint.website/sitemap.xml

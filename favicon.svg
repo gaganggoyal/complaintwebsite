@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Complaint.Website">
+  <!-- Tuned for 16px: near-full-bleed shield, thicker tick, no sheen or shadow
+       detail that would turn to mud at tab size. -->
+  <rect width="32" height="32" rx="7" fill="#ec5f22"/>
+  <g transform="translate(3.4 3)  scale(1.06)">
+    <path d="M12 2.3 4.3 5.2v6c0 4.5 3.1 8.3 7.7 10.4 4.6-2.1 7.7-5.9 7.7-10.4v-6L12 2.3Z" fill="#fff"/>
+    <path d="m8.3 12 2.6 2.6 4.8-5.1" fill="none" stroke="#e85a18" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

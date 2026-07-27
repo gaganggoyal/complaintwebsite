@@ -105,7 +105,35 @@ app.use((req, res, next) => {
 // Serve the marketing site + auth pages (project root, one level up)
 app.use(express.static(path.join(__dirname, '..'), {
   extensions: ['html'],
-  dotfiles: 'ignore'
+  dotfiles: 'ignore',
+  // Caching policy lives here rather than in the reverse proxy. Setting it in
+  // both places produced two Cache-Control headers on every response — the
+  // proxy appends to what this app already sent instead of replacing it — and
+  // "max-age=2592000, max-age=0" is a coin toss.
+  setHeaders(res, filePath) {
+    const name = path.basename(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+
+    // The worker and the manifest decide what an installed app does. Cached
+    // hard, a visitor stays pinned to an old worker — and the worker is the
+    // one file a bad deploy cannot be fixed without.
+    if (name === 'sw.js' || name === 'manifest.webmanifest') {
+      res.setHeader('Cache-Control', 'no-cache');
+      return;
+    }
+
+    // Images and fonts are effectively immutable: a brand change ships under a
+    // new filename rather than replacing one in place.
+    if (['.png', '.jpg', '.jpeg', '.svg', '.ico', '.webp', '.woff', '.woff2'].includes(ext)) {
+      res.setHeader('Cache-Control', 'public, max-age=2592000');
+      return;
+    }
+
+    // Everything else revalidates. A long max-age on HTML, CSS or JS means a
+    // deployed fix cannot reach a browser that already holds the broken copy;
+    // ETags make each revalidation a cheap 304.
+    res.setHeader('Cache-Control', 'no-cache');
+  }
 }));
 
 // Latest Shorts for the Complaint Boss section on the homepage.
