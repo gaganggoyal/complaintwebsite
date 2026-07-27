@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d2430">
+<meta name="format-detection" content="telephone=no">
+<title>Admin — Complaint.Website</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/auth.css">
+<style>
+  .admin-wrap{width:100%;max-width:1120px;margin:0 auto;padding:32px 18px 64px}
+  .admin-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+  .admin-bar h1{font-family:var(--font-head);color:var(--navy);font-size:24px;margin:0}
+  .admin-bar .sub{color:var(--muted);font-size:13px;margin-top:3px}
+  .btn-sm{width:auto;padding:9px 16px;font-size:14px;border-radius:12px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:0 4px 14px rgba(40,28,16,.05)}
+  .stat .n{font-family:var(--font-head);font-size:26px;font-weight:800;color:var(--navy);line-height:1.1}
+  .stat .k{font-size:12px;color:var(--muted);margin-top:3px;font-weight:600;letter-spacing:.3px}
+  .stat.warn .n{color:var(--saffron-dark)}
+  .stat.good .n{color:var(--green-dark)}
+
+  .toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .toolbar input{flex:1;min-width:220px;padding:11px 14px;border:2px solid var(--line);border-radius:13px;font-family:var(--font-body);font-size:14.5px;background:#fff}
+  .toolbar input:focus{outline:0;border-color:var(--saffron);box-shadow:0 0 0 4px rgba(255,122,51,.14)}
+  .toolbar select{padding:11px 14px;border:2px solid var(--line);border-radius:13px;font-family:var(--font-body);font-size:14.5px;background:#fff;color:var(--ink)}
+
+  .table-card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+  .table-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:840px}
+  th{text-align:left;padding:12px 14px;background:#fdf6ee;color:var(--navy);font-weight:700;font-size:12.5px;letter-spacing:.3px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:12px 14px;border-bottom:1px solid #f4ece1;vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  tr:hover td{background:#fffdf9}
+  .nm{font-weight:700;color:var(--navy)}
+  .sub2{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .mono{font-variant-numeric:tabular-nums}
+
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+  .pill.active{background:#e7f8ee;color:var(--green-dark);border:1px solid #b9e8cd}
+  .pill.pending{background:#fff4e6;color:#b3651a;border:1px solid #f6ddba}
+  .pill.unver{background:#fdf0ec;color:#b3402a;border:1px solid #f4cdbf}
+
+  .act{display:flex;gap:7px;flex-wrap:wrap}
+  .mini{padding:7px 12px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;border:0;font-family:var(--font-body);white-space:nowrap}
+  .mini:disabled{opacity:.55;cursor:not-allowed}
+  .mini.go{background:linear-gradient(135deg,#2ee06f,var(--green-dark));color:#fff}
+  .mini.un{background:#fff;border:1.5px solid var(--line);color:var(--navy)}
+  .mini.wa{background:#fff;border:1.5px solid #b9e8cd;color:var(--green-dark);text-decoration:none;display:inline-flex;align-items:center}
+  .mini.del{background:#fff;border:1.5px solid #f4cdbf;color:#b3402a}
+
+  .empty{padding:44px 20px;text-align:center;color:var(--muted)}
+  .login-wrap{max-width:420px;margin:0 auto;padding:56px 20px}
+  #adminApp{display:none}
+  .note-in{width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:9px;font-family:var(--font-body);font-size:12.5px;background:#fff;min-width:130px}
+  .note-in:focus{outline:0;border-color:var(--saffron)}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="tricolor"></div>
+<header class="auth-header">
+  <div class="bar">
+    <a class="logo" href="index.html">
+      <div class="logo-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.3 4.3 5.2v6c0 4.5 3.1 8.3 7.7 10.4 4.6-2.1 7.7-5.9 7.7-10.4v-6L12 2.3Z" fill="#fff" fill-opacity=".96"/><path d="m8.3 12 2.6 2.6 4.8-5.1" fill="none" stroke="#ec5f22" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="logo-text"><b>complaint<em>.website</em></b><span>Admin panel</span></div>
+    </a>
+  </div>
+</header>
+
+<!-- Sign in -->
+<main id="adminLogin" class="login-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <h1>Admin sign in</h1>
+      <p>Enter the admin password to manage customer accounts.</p>
+    </div>
+    <div id="admAlert" class="alert"></div>
+    <form id="adminLoginForm" novalidate>
+      <div class="field">
+        <label for="admPass">Admin password</label>
+        <div class="pw-wrap">
+          <input id="admPass" type="password" autocomplete="current-password" required>
+          <button type="button" class="pw-toggle" data-target="admPass">Show</button>
+        </div>
+      </div>
+      <button id="admSubmit" type="submit" class="btn btn-cta">Sign in</button>
+    </form>
+  </div>
+</main>
+
+<!-- Panel -->
+<main id="adminApp" class="admin-wrap">
+  <div class="admin-bar">
+    <div>
+      <h1>Customers</h1>
+      <div class="sub">Mark a customer <b>Active</b> once their payment lands on WhatsApp.</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button id="refreshBtn" type="button" class="btn btn-outline btn-sm">Refresh</button>
+      <button id="admLogout" type="button" class="btn btn-navy btn-sm">Log out</button>
+    </div>
+  </div>
+
+  <div id="listAlert" class="alert"></div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="stTotal">—</div><div class="k">TOTAL SIGNUPS</div></div>
+    <div class="stat"><div class="n" id="stVerified">—</div><div class="k">EMAIL VERIFIED</div></div>
+    <div class="stat warn"><div class="n" id="stPending">—</div><div class="k">AWAITING PAYMENT</div></div>
+    <div class="stat good"><div class="n" id="stActive">—</div><div class="k">ACTIVE</div></div>
+  </div>
+
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search name, email or phone…" autocomplete="off">
+    <select id="filter">
+      <option value="all">All customers</option>
+      <option value="pending">Awaiting payment</option>
+      <option value="active">Active</option>
+      <option value="unverified">Email not verified</option>
+    </select>
+  </div>
+
+  <div class="table-card">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer</th><th>Plan</th><th>Status</th><th>Registered</th><th>Note</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div id="emptyState" class="empty" style="display:none">No customers match this view.</div>
+  </div>
+</main>
+
+<script src="assets/admin.js"></script>
+</body>
+</html>

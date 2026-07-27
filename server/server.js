@@ -9,8 +9,10 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 
+const SqliteStore = require('better-sqlite3-session-store')(session);
+
 const db = require('./db');
-const { sendOtpEmail, hasSmtp } = require('./mailer');
+const { sendOtpEmail, hasEmail, mode: mailMode } = require('./mailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,16 +35,41 @@ const validEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const validPhone = (p) => /^[0-9+\-\s]{7,15}$/.test(p);
 const cleanEmail = (e) => (e || '').trim().toLowerCase();
 
+// Sign a user in on a fresh session id, so a session fixed before login
+// cannot be reused afterwards.
+function signIn(req, userId) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((err) => {
+      if (err) return reject(err);
+      req.session.userId = userId;
+      resolve();
+    });
+  });
+}
+
 // ---------- middleware ----------
 app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// A missing secret in production would silently log everyone out on each
+// restart, so refuse to start rather than run in that state.
 if (!process.env.SESSION_SECRET) {
+  if (isProd) {
+    console.error('✖  SESSION_SECRET must be set in production. Refusing to start.');
+    process.exit(1);
+  }
   console.warn('⚠️  SESSION_SECRET is not set in .env — using a temporary secret (sessions reset on restart).');
 }
+
 app.use(session({
   name: 'cw.sid',
+  // Sessions live in the SQLite file, so restarts and deploys don't sign
+  // everyone out (the default MemoryStore also leaks under real traffic).
+  store: new SqliteStore({
+    client: db.raw,
+    expired: { clear: true, intervalMs: 15 * 60 * 1000 }
+  }),
   secret: process.env.SESSION_SECRET || crypto.randomBytes(24).toString('hex'),
   resave: false,
   saveUninitialized: false,
@@ -103,7 +130,17 @@ app.post('/api/register', authLimiter, async (req, res) => {
     if (existing) db.updateUnverified(record);
     else db.createUser({ ...record, created_at: now });
 
-    const result = await sendOtpEmail(email, name, otp);
+    // The account row already exists at this point; if delivery fails the user
+    // can still recover via "resend" on the verify page, so say so plainly
+    // instead of returning an opaque 500.
+    let result;
+    try {
+      result = await sendOtpEmail(email, name, otp);
+    } catch (mailErr) {
+      console.error('register: email delivery failed:', mailErr);
+      return res.status(502).json({ error: 'We could not send the verification email just now. Please try again in a moment.' });
+    }
+
     req.session.pendingEmail = email;
     return res.json({ ok: true, email, devMode: !!result.devMode });
   } catch (e) {
@@ -120,7 +157,7 @@ app.post('/api/verify', otpLimiter, async (req, res) => {
 
     const user = db.getUserByEmail(email);
     if (!user) return res.status(404).json({ error: 'No pending registration for this email.' });
-    if (user.email_verified) { req.session.userId = user.id; return res.json({ ok: true }); }
+    if (user.email_verified) { await signIn(req, user.id); return res.json({ ok: true }); }
 
     if (!user.otp_hash || !user.otp_expires || Date.now() > user.otp_expires) {
       return res.status(400).json({ error: 'Your code has expired. Please resend a new code.' });
@@ -136,8 +173,7 @@ app.post('/api/verify', otpLimiter, async (req, res) => {
     }
 
     db.markVerified(email, Date.now());
-    req.session.userId = user.id;
-    delete req.session.pendingEmail;
+    await signIn(req, user.id);
     return res.json({ ok: true });
   } catch (e) {
     console.error('verify error:', e);
@@ -161,7 +197,13 @@ app.post('/api/resend', otpLimiter, async (req, res) => {
     const now = Date.now();
     db.setOtp(email, otpHash, now + OTP_TTL, now);
 
-    const result = await sendOtpEmail(email, user.name, otp);
+    let result;
+    try {
+      result = await sendOtpEmail(email, user.name, otp);
+    } catch (mailErr) {
+      console.error('resend: email delivery failed:', mailErr);
+      return res.status(502).json({ error: 'We could not send the email just now. Please try again in a moment.' });
+    }
     return res.json({ ok: true, devMode: !!result.devMode });
   } catch (e) {
     console.error('resend error:', e);
@@ -186,12 +228,18 @@ app.post('/api/login', authLimiter, async (req, res) => {
       const otpHash = await bcrypt.hash(otp, 10);
       const now = Date.now();
       db.setOtp(email, otpHash, now + OTP_TTL, now);
-      const result = await sendOtpEmail(email, user.name, otp);
+      let result = {};
+      try {
+        result = await sendOtpEmail(email, user.name, otp);
+      } catch (mailErr) {
+        // Still send them to the verify page — "resend" there is the retry.
+        console.error('login: email delivery failed:', mailErr);
+      }
       req.session.pendingEmail = email;
       return res.status(403).json({ error: 'Please verify your email first — we just sent you a code.', needVerify: true, email, devMode: !!result.devMode });
     }
 
-    req.session.userId = user.id;
+    await signIn(req, user.id);
     return res.json({ ok: true });
   } catch (e) {
     console.error('login error:', e);
@@ -221,10 +269,106 @@ app.get('/api/me', (req, res) => {
   });
 });
 
+// ---------- admin ----------
+// Guarded by a single ADMIN_PASSWORD in .env. If it is unset the whole admin
+// surface stays switched off, so a forgotten config can never expose customer
+// data behind a blank password.
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const adminEnabled = ADMIN_PASSWORD.length > 0;
+const adminLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false });
+
+// Constant-time compare over digests, so lengths match and the comparison
+// leaks no timing information about the password.
+function passwordMatches(given) {
+  const a = crypto.createHash('sha256').update(String(given)).digest();
+  const b = crypto.createHash('sha256').update(ADMIN_PASSWORD).digest();
+  return crypto.timingSafeEqual(a, b);
+}
+
+function requireAdmin(req, res, next) {
+  if (!adminEnabled) return res.status(503).json({ error: 'Admin is not configured on this server.' });
+  if (!req.session.isAdmin) return res.status(401).json({ error: 'Not signed in as admin.' });
+  next();
+}
+
+app.post('/api/admin/login', adminLimiter, (req, res) => {
+  if (!adminEnabled) return res.status(503).json({ error: 'Admin is not configured on this server.' });
+  const password = (req.body && req.body.password) || '';
+  if (!password || !passwordMatches(password)) {
+    return res.status(401).json({ error: 'Incorrect password.' });
+  }
+  // Prevent session fixation: a login must not keep the pre-login session id.
+  req.session.regenerate((err) => {
+    if (err) return res.status(500).json({ error: 'Could not start session.' });
+    req.session.isAdmin = true;
+    res.json({ ok: true });
+  });
+});
+
+app.post('/api/admin/logout', (req, res) => {
+  req.session.destroy(() => res.json({ ok: true }));
+});
+
+app.get('/api/admin/session', (req, res) => {
+  res.json({ enabled: adminEnabled, signedIn: !!req.session.isAdmin });
+});
+
+// Customer list + headline counts for the dashboard.
+app.get('/api/admin/users', requireAdmin, (req, res) => {
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  const perPage = 50;
+  const users = db.listUsers(perPage, (page - 1) * perPage);
+  res.json({
+    users,
+    stats: db.stats(),
+    page,
+    perPage,
+    total: db.countUsers()
+  });
+});
+
+// Flip a customer between pending and active after payment lands on WhatsApp.
+app.post('/api/admin/status', requireAdmin, (req, res) => {
+  const id = parseInt(req.body && req.body.id, 10);
+  const status = (req.body && req.body.status) || '';
+  if (!id) return res.status(400).json({ error: 'Missing user id.' });
+  if (status !== 'active' && status !== 'pending') {
+    return res.status(400).json({ error: 'Status must be "active" or "pending".' });
+  }
+  const user = db.getUserById(id);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+
+  db.setStatus(id, status, status === 'active' ? Date.now() : null);
+  console.log(`admin: ${user.email} -> ${status}`);
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/note', requireAdmin, (req, res) => {
+  const id = parseInt(req.body && req.body.id, 10);
+  const note = String((req.body && req.body.note) || '').slice(0, 500);
+  if (!id) return res.status(400).json({ error: 'Missing user id.' });
+  db.setNote(id, note);
+  res.json({ ok: true });
+});
+
+// For clearing out test signups and spam.
+app.post('/api/admin/delete', requireAdmin, (req, res) => {
+  const id = parseInt(req.body && req.body.id, 10);
+  if (!id) return res.status(400).json({ error: 'Missing user id.' });
+  const user = db.getUserById(id);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+  db.deleteUser(id);
+  console.log(`admin: deleted ${user.email}`);
+  res.json({ ok: true });
+});
+
 app.listen(PORT, () => {
-  console.log(`\n  complaint.website running on http://localhost:${PORT}\n`);
-  if (!hasSmtp) {
-    console.log('  ⚠️  SMTP not configured — verification codes will be printed here (dev mode).');
-    console.log('      Configure server/.env to send real emails.\n');
+  console.log(`\n  complaint.website running on http://localhost:${PORT}`);
+  console.log(`  env: ${isProd ? 'production' : 'development'} · email: ${mailMode} · admin: ${adminEnabled ? 'on' : 'OFF (set ADMIN_PASSWORD)'}`);
+  if (!hasEmail) {
+    console.log('\n  ⚠️  Email not configured — verification codes will be printed here (dev mode).');
+    console.log('      Set RESEND_API_KEY or SMTP_* in server/.env to send real emails.\n');
+  } else {
+    console.log('');
   }
 });

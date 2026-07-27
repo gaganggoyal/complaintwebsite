@@ -1,16 +1,27 @@
 // Email sending for OTP verification codes.
-// If SMTP is not configured in .env, codes are printed to the terminal (dev mode)
-// so you can test the whole flow before setting up email.
+//
+// Three delivery modes, picked in this order:
+//   1. RESEND_API_KEY set  -> Resend HTTP API (no SMTP ports needed)
+//   2. SMTP_USER/PASS set  -> any SMTP provider (Brevo, Zoho, Gmail app password…)
+//   3. neither             -> DEV MODE: codes print to the terminal
+//
+// Mode 3 lets the whole flow be tested before email is configured.
 const nodemailer = require('nodemailer');
 
+const resendKey = process.env.RESEND_API_KEY || '';
+const hasResend = !!resendKey;
 const hasSmtp = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+const hasEmail = hasResend || hasSmtp;
+
+// Which mode we ended up in — logged at startup so misconfiguration is obvious.
+const mode = hasResend ? 'resend' : (hasSmtp ? 'smtp' : 'dev');
 
 let transporter = null;
-if (hasSmtp) {
+if (!hasResend && hasSmtp) {
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: Number(process.env.SMTP_PORT || 465),
-    secure: String(process.env.SMTP_SECURE || 'true') === 'true',
+    secure: String(process.env.SMTP_SECURE || 'true') !== 'false',
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
   });
 }
@@ -30,6 +41,30 @@ function otpEmailHtml(name, otp) {
   </div>`;
 }
 
+// Resend's HTTP API. Node 18+ has global fetch, so this needs no new dependency.
+async function sendViaResend({ from, to, subject, text, html }) {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${resendKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ from, to: [to], subject, text, html })
+  });
+
+  if (!res.ok) {
+    // Surface Resend's own message — it names the real problem (unverified
+    // domain, bad key), which is otherwise very hard to guess from a 500.
+    let detail = '';
+    try {
+      const body = await res.json();
+      detail = body && (body.message || body.name) ? `${body.name || ''} ${body.message || ''}`.trim() : '';
+    } catch (e) { /* non-JSON error body — status alone will have to do */ }
+    throw new Error(`Resend API ${res.status}${detail ? ': ' + detail : ''}`);
+  }
+  return { devMode: false };
+}
+
 async function sendOtpEmail(to, name, otp) {
   const from = process.env.MAIL_FROM || process.env.SMTP_USER || 'no-reply@complaint.website';
   const subject = 'Your complaint.website verification code';
@@ -38,17 +73,20 @@ async function sendOtpEmail(to, name, otp) {
     `Your verification code is: ${otp}\n\n` +
     `It is valid for 10 minutes. If you did not request this, ignore this email.\n\n` +
     `— complaint.website (An IndiaOffers.in Company)`;
+  const html = otpEmailHtml(name, otp);
 
-  if (!transporter) {
-    console.log('\n================ DEV MODE — EMAIL NOT CONFIGURED ================');
-    console.log(`  OTP for ${to}: ${otp}`);
-    console.log('  (Set SMTP_* in server/.env to send real emails.)');
-    console.log('================================================================\n');
-    return { devMode: true };
+  if (hasResend) return sendViaResend({ from, to, subject, text, html });
+
+  if (transporter) {
+    await transporter.sendMail({ from, to, subject, text, html });
+    return { devMode: false };
   }
 
-  await transporter.sendMail({ from, to, subject, text, html: otpEmailHtml(name, otp) });
-  return { devMode: false };
+  console.log('\n================ DEV MODE — EMAIL NOT CONFIGURED ================');
+  console.log(`  OTP for ${to}: ${otp}`);
+  console.log('  (Set RESEND_API_KEY or SMTP_* in server/.env to send real emails.)');
+  console.log('================================================================\n');
+  return { devMode: true };
 }
 
-module.exports = { sendOtpEmail, hasSmtp };
+module.exports = { sendOtpEmail, hasSmtp, hasEmail, mode };

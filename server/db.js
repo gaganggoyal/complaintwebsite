@@ -29,6 +29,13 @@ CREATE TABLE IF NOT EXISTS users (
 );
 `);
 
+// --- migrations -------------------------------------------------------------
+// Added after the first deploy, so they are applied defensively rather than
+// being part of the CREATE TABLE above (which only runs on a fresh database).
+const cols = new Set(db.prepare('PRAGMA table_info(users)').all().map((c) => c.name));
+if (!cols.has('activated_at')) db.exec('ALTER TABLE users ADD COLUMN activated_at INTEGER');
+if (!cols.has('admin_note')) db.exec('ALTER TABLE users ADD COLUMN admin_note TEXT');
+
 const q = {
   byEmail: db.prepare('SELECT * FROM users WHERE email = ?'),
   byId: db.prepare('SELECT * FROM users WHERE id = ?'),
@@ -41,7 +48,23 @@ const q = {
     WHERE email = @email`),
   setOtp: db.prepare('UPDATE users SET otp_hash = ?, otp_expires = ?, otp_last_sent = ?, otp_attempts = 0 WHERE email = ?'),
   incAttempts: db.prepare('UPDATE users SET otp_attempts = otp_attempts + 1 WHERE email = ?'),
-  markVerified: db.prepare('UPDATE users SET email_verified = 1, otp_hash = NULL, otp_expires = NULL, otp_attempts = 0, verified_at = ? WHERE email = ?')
+  markVerified: db.prepare('UPDATE users SET email_verified = 1, otp_hash = NULL, otp_expires = NULL, otp_attempts = 0, verified_at = ? WHERE email = ?'),
+
+  // --- admin ---
+  // otp_hash / password_hash are deliberately never selected here.
+  listUsers: db.prepare(`SELECT id, name, email, phone, plan, plan_status, email_verified,
+      created_at, verified_at, activated_at, admin_note
+    FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?`),
+  countUsers: db.prepare('SELECT COUNT(*) AS n FROM users'),
+  stats: db.prepare(`SELECT
+      COUNT(*) AS total,
+      SUM(CASE WHEN email_verified = 1 THEN 1 ELSE 0 END) AS verified,
+      SUM(CASE WHEN plan_status = 'active' THEN 1 ELSE 0 END) AS active,
+      SUM(CASE WHEN plan_status != 'active' THEN 1 ELSE 0 END) AS pending
+    FROM users`),
+  setStatus: db.prepare('UPDATE users SET plan_status = ?, activated_at = ? WHERE id = ?'),
+  setNote: db.prepare('UPDATE users SET admin_note = ? WHERE id = ?'),
+  deleteUser: db.prepare('DELETE FROM users WHERE id = ?')
 };
 
 module.exports = {
@@ -51,5 +74,16 @@ module.exports = {
   updateUnverified: (u) => q.updateUnverified.run(u),
   setOtp: (email, hash, expires, lastSent) => q.setOtp.run(hash, expires, lastSent, email),
   incOtpAttempts: (email) => q.incAttempts.run(email),
-  markVerified: (email, ts) => q.markVerified.run(ts, email)
+  markVerified: (email, ts) => q.markVerified.run(ts, email),
+
+  // --- admin ---
+  listUsers: (limit, offset) => q.listUsers.all(limit, offset),
+  countUsers: () => q.countUsers.get().n,
+  stats: () => q.stats.get(),
+  setStatus: (id, status, ts) => q.setStatus.run(status, ts, id),
+  setNote: (id, note) => q.setNote.run(note, id),
+  deleteUser: (id) => q.deleteUser.run(id),
+
+  // Exposed so the session store can share this one connection.
+  raw: db
 };
