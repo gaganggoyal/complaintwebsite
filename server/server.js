@@ -108,6 +108,20 @@ app.use(express.static(path.join(__dirname, '..'), {
   dotfiles: 'ignore'
 }));
 
+// Latest Shorts for the Complaint Boss section on the homepage.
+// Public and cached upstream; a failure here must never break the page, so it
+// always answers 200 with whatever list is available (possibly empty).
+const { getVideos } = require('./youtube');
+app.get('/api/videos', async (req, res) => {
+  try {
+    res.set('Cache-Control', 'public, max-age=900');
+    res.json({ videos: await getVideos(6) });
+  } catch (e) {
+    console.error('videos error:', e && e.message);
+    res.json({ videos: [] });
+  }
+});
+
 // ---------- rate limiters ----------
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 40, standardHeaders: true, legacyHeaders: false });
 const otpLimiter  = rateLimit({ windowMs: 10 * 60 * 1000, max: 12, standardHeaders: true, legacyHeaders: false });

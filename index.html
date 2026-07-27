@@ -448,6 +448,31 @@
   @media(prefers-reduced-motion:reduce){
     .hero-orb,.wa-float::before,.tb-right .dot,.hero-eyebrow .dot{animation:none}
   }
+  /* ===== Human, not AI ===== */
+  .human{background:radial-gradient(800px 400px at 15% 0%,rgba(255,122,51,.28),transparent 60%),linear-gradient(160deg,#1f4d5e,var(--navy-dark));color:#fff;position:relative;overflow:hidden}
+  .human::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--saffron) 0 33.3%,#fff 33.3% 66.6%,#138808 66.6%);height:3px}
+  .human-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
+  .human-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#ffd9bd;font-weight:800;font-size:12px;letter-spacing:1.3px;text-transform:uppercase;padding:8px 16px;border-radius:100px;margin-bottom:18px}
+  .human h2{font-size:clamp(26px,3.6vw,40px);color:#fff;letter-spacing:-.6px;font-weight:800;line-height:1.2;margin-bottom:14px}
+  .human h2 .no{color:var(--gold)}
+  .human .lead{color:#cfe0e7;font-size:16.5px;line-height:1.75;margin-bottom:8px}
+  .human .lead b{color:#fff}
+  .human-points{display:flex;flex-direction:column;gap:14px}
+  .human-point{display:flex;gap:13px;align-items:flex-start;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:16px;padding:15px 17px}
+  .human-point .n{flex:0 0 auto;width:32px;height:32px;border-radius:10px;background:linear-gradient(145deg,var(--saffron),var(--saffron-dark));display:flex;align-items:center;justify-content:center;font-size:16px}
+  .human-point b{display:block;color:#fff;font-size:15px;margin-bottom:3px}
+  .human-point span{color:#b9cfd8;font-size:14px;line-height:1.6}
+  @media(max-width:900px){.human-grid{grid-template-columns:1fr;gap:30px}}
+
+  /* latest Shorts strip inside the channel card */
+  .boss-shorts{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 12px 2px}
+  .boss-short{position:relative;display:block;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:#0d2430;text-decoration:none;box-shadow:0 4px 14px rgba(40,28,16,.14)}
+  .boss-short img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
+  .boss-short:hover img{transform:scale(1.05)}
+  .boss-short .ov{position:absolute;left:0;right:0;bottom:0;padding:26px 10px 10px;background:linear-gradient(180deg,transparent,rgba(8,20,26,.92));color:#fff;font-size:12px;font-weight:700;line-height:1.4}
+  .boss-short .pl{position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;background:rgba(196,48,43,.95);display:flex;align-items:center;justify-content:center}
+  .boss-short .pl::after{content:"";border-left:8px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-left:2px}
+
   /* ===== Complaint Boss — YouTube ===== */
   .boss{background:linear-gradient(180deg,#fff,var(--bg));border-top:1px solid var(--line)}
   .boss-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
@@ -520,6 +545,7 @@
       <a href="#approach"><span class="l-en">Our Approach</span><span class="l-hi">हमारा तरीका</span></a>
       <a href="#services"><span class="l-en">What We Solve</span><span class="l-hi">हम क्या सुलझाते हैं</span></a>
       <a href="#how"><span class="l-en">How It Works</span><span class="l-hi">कैसे काम करता है</span></a>
+      <a href="#human"><span class="l-en">Human, not AI</span><span class="l-hi">इंसान, AI नहीं</span></a>
       <a href="#genuine"><span class="l-en">Genuine Complaints</span><span class="l-hi">Genuine शिकायतें</span></a>
       <a href="#boss"><span class="l-en">Complaint Boss</span><span class="l-hi">Complaint Boss</span></a>
       <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
@@ -553,6 +579,7 @@
       <a href="#approach"><span class="l-en">Our Approach</span><span class="l-hi">हमारा तरीका</span></a>
       <a href="#services"><span class="l-en">What We Solve</span><span class="l-hi">हम क्या सुलझाते हैं</span></a>
       <a href="#how"><span class="l-en">How It Works</span><span class="l-hi">कैसे काम करता है</span></a>
+      <a href="#human"><span class="l-en">Human, not AI</span><span class="l-hi">इंसान, AI नहीं</span></a>
       <a href="#genuine"><span class="l-en">Genuine Complaints</span><span class="l-hi">Genuine शिकायतें</span></a>
       <a href="#boss"><span class="l-en">Complaint Boss</span><span class="l-hi">Complaint Boss</span></a>
       <a href="#pricing"><span class="l-en">Pricing</span><span class="l-hi">क़ीमत</span></a>
@@ -600,6 +627,8 @@
         <span class="chip l-hi">✔ हिंदी + English support</span>
         <span class="chip l-en">▶ Complaint Boss on YouTube</span>
         <span class="chip l-hi">▶ YouTube पर Complaint Boss</span>
+        <span class="chip l-en">✍️ Written by a human, never AI</span>
+        <span class="chip l-hi">✍️ इंसान का लिखा, AI का नहीं</span>
       </div>
       <div class="hero-trust l-en">
         <span><i>🔒</i> No OTP / PIN ever asked</span>
@@ -778,6 +807,49 @@
 </section>
 
 <!-- ================= GENUINE COMPLAINTS POLICY ================= -->
+<!-- ================= HUMAN, NOT AI ================= -->
+<section id="human" class="human">
+  <div class="wrap human-grid">
+    <div>
+      <div class="human-badge">
+        <span class="l-en">✍️ Written by a person</span><span class="l-hi">✍️ इंसान का लिखा हुआ</span>
+      </div>
+      <h2 class="l-en"><span class="no">No AI</span> writes your complaint.</h2>
+      <h2 class="l-hi">आपकी शिकायत <span class="no">कोई AI</span> नहीं लिखता।</h2>
+      <p class="lead l-en">Every complaint is drafted by a <b>human expert with 15+ years inside e-commerce and banking</b> — the same person you see on Complaint Boss. Not a chatbot, not a template generator.</p>
+      <p class="lead l-hi">हर शिकायत <b>e-commerce और banking में 15+ साल का अनुभव रखने वाला इंसान</b> ख़ुद लिखता है — वही जिन्हें आप Complaint Boss पर देखते हैं। कोई chatbot नहीं, कोई template generator नहीं।</p>
+      <p class="lead l-en">This matters more than it sounds. AI-written complaints read like templates — and a template is exactly what a company closes with a copy-paste reply. A complaint that names the right rule, the right desk and the right deadline gets acted on.</p>
+      <p class="lead l-hi">यह बात जितनी लगती है, उससे ज़्यादा मायने रखती है। AI से लिखी शिकायतें template जैसी लगती हैं — और template वाली शिकायत कंपनी copy-paste जवाब देकर बंद कर देती है। जो शिकायत सही नियम, सही desk और सही समय-सीमा का ज़िक्र करती है, उस पर action होता है।</p>
+    </div>
+    <div class="human-points">
+      <div class="human-point">
+        <div class="n">👀</div>
+        <div>
+          <b class="l-en">A person reads your case</b><b class="l-hi">आपका case इंसान पढ़ता है</b>
+          <span class="l-en">Your messages, bills and screenshots are read by someone who knows what actually matters in them.</span>
+          <span class="l-hi">आपके messages, bill और screenshots वही पढ़ता है जिसे पता है कि उनमें असल में क्या मायने रखता है।</span>
+        </div>
+      </div>
+      <div class="human-point">
+        <div class="n">✍️</div>
+        <div>
+          <b class="l-en">A person writes the email</b><b class="l-hi">Email इंसान लिखता है</b>
+          <span class="l-en">Drafted for your specific company and issue, and sent to the escalation desk that has to respond.</span>
+          <span class="l-hi">आपकी कंपनी और आपके मामले के हिसाब से, और उस escalation desk को जिसे जवाब देना ही पड़ता है।</span>
+        </div>
+      </div>
+      <div class="human-point">
+        <div class="n">🤝</div>
+        <div>
+          <b class="l-en">A person follows up</b><b class="l-hi">इंसान ही follow-up करता है</b>
+          <span class="l-en">Replies are read, next steps decided, and pressure kept on until you get a resolution.</span>
+          <span class="l-hi">जवाब पढ़े जाते हैं, अगला कदम तय होता है, और समाधान मिलने तक दबाव बना रहता है।</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="genuine" class="policy">
   <div class="wrap">
     <div class="sec-title">
@@ -909,14 +981,17 @@
         <a class="btn btn-cta l-en" href="register.html">Register Free →</a>
         <a class="btn btn-cta l-hi" href="register.html">फ़्री रजिस्टर →</a>
       </div>
-      <p class="boss-note l-en">The channel is brand new — subscribe now and the first episodes reach you as they go live.</p>
-      <p class="boss-note l-hi">चैनल बिलकुल नया है — अभी subscribe कीजिए, पहले episodes आते ही आप तक पहुँचेंगे।</p>
+      <p class="boss-note l-en">Short, straight answers to the problems consumers hit every day — in Hindi. Subscribe and new ones reach you as they go up.</p>
+      <p class="boss-note l-hi">रोज़मर्रा की उपभोक्ता दिक़्क़तों के छोटे, सीधे जवाब — हिंदी में। Subscribe कीजिए, नए Shorts आते ही आप तक पहुँचेंगे।</p>
     </div>
 
     <div class="boss-card">
-      <div class="boss-thumb">
-        <span class="boss-thumb-tag l-en">Launching now</span>
-        <span class="boss-thumb-tag l-hi">अभी शुरू</span>
+      <!-- Latest Shorts, loaded from the channel feed so this stays current
+           without a redeploy. The static thumb below is the fallback. -->
+      <div class="boss-shorts" id="bossShorts" hidden></div>
+      <div class="boss-thumb" id="bossThumbFallback">
+        <span class="boss-thumb-tag l-en">New Shorts</span>
+        <span class="boss-thumb-tag l-hi">नए Shorts</span>
         <div class="boss-play" aria-hidden="true"></div>
       </div>
       <div class="boss-meta">
@@ -1073,6 +1148,11 @@
       <summary><span class="l-en">Is this service legal?</span><span class="l-hi">क्या यह service क़ानूनी है?</span></summary>
       <div class="ans l-en">Yes. Every consumer in India has the legal right to complain to a company and escalate to its grievance officers, the National Consumer Helpline, and sector ombudsmen. We are a consumer-assistance service: we help you draft, send, and follow up on your own complaint properly. We are not a law firm and we do not represent you in court — if your case ever needs a lawyer or formal consumer-court filing, we will tell you honestly and guide you to the right channel.</div>
       <div class="ans l-hi">हाँ। भारत के हर उपभोक्ता को क़ानूनी अधिकार है कि वह कंपनी से शिकायत करे और grievance officer, National Consumer Helpline और sector ombudsman तक escalate करे। हम एक consumer-assistance service हैं: आपकी अपनी शिकायत सही तरीके से draft करने, भेजने और follow-up करने में मदद करते हैं। हम law firm नहीं हैं और court में पैरवी नहीं करते — अगर कभी आपके case को वकील या consumer-court filing की ज़रूरत हुई, तो हम ईमानदारी से बताएँगे और सही रास्ता दिखाएँगे।</div>
+    </details>
+    <details>
+      <summary><span class="l-en">Is my complaint written by AI?</span><span class="l-hi">क्या मेरी शिकायत AI लिखता है?</span></summary>
+      <div class="ans l-en">No. A human expert with 15+ years of complaint-resolution experience in e-commerce and banking reads your case and writes the email personally — the same person you see on our YouTube channel, Complaint Boss. We do not run your complaint through a chatbot or a template generator. This is deliberate: AI-written complaints read like templates, and a template is exactly what a company closes with a copy-paste reply. What moves a complaint is naming the right rule, the right escalation desk and the right deadline for <b>your</b> specific case — and then a person reading the reply and deciding the next step.</div>
+      <div class="ans l-hi">नहीं। e-commerce और banking में 15+ साल का complaint-resolution अनुभव रखने वाला इंसान आपका case पढ़कर ख़ुद email लिखता है — वही जिन्हें आप हमारे YouTube चैनल Complaint Boss पर देखते हैं। हम आपकी शिकायत किसी chatbot या template generator से नहीं निकालते। यह जानबूझकर है: AI से लिखी शिकायतें template जैसी लगती हैं, और template वाली शिकायत कंपनी copy-paste जवाब देकर बंद कर देती है। असर तब होता है जब <b>आपके</b> मामले के लिए सही नियम, सही escalation desk और सही समय-सीमा का ज़िक्र हो — और फिर कोई इंसान जवाब पढ़कर अगला कदम तय करे।</div>
     </details>
     <details>
       <summary><span class="l-en">Do you guarantee my complaint will be resolved?</span><span class="l-hi">क्या आप guarantee देते हैं कि शिकायत resolve होगी?</span></summary>
@@ -1285,6 +1365,52 @@
       });
     },{ threshold:.12, rootMargin:'0px 0px -36px 0px' });
     els.forEach(function(el){ io.observe(el); });
+  })();
+
+  /* Latest Complaint Boss Shorts, pulled from the channel feed so the card
+     stays current without a redeploy. Silent on failure: the static thumbnail
+     already in the markup remains, so the section never looks broken. */
+  (function(){
+    var wrap = document.getElementById('bossShorts');
+    if(!wrap || !window.fetch) return;
+
+    fetch('/api/videos').then(function(r){
+      return r.ok ? r.json() : null;
+    }).then(function(data){
+      var vids = (data && data.videos) || [];
+      if(!vids.length) return;
+
+      vids.slice(0,2).forEach(function(v){
+        var a = document.createElement('a');
+        a.className = 'boss-short';
+        a.href = v.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+
+        var img = document.createElement('img');
+        img.src = v.thumb;
+        img.alt = v.title;
+        img.loading = 'lazy';
+        /* Not every video exposes an original-aspect thumbnail; fall back to
+           the always-present one rather than showing a broken image. */
+        img.onerror = function(){
+          if(img.dataset.fallback) return;
+          img.dataset.fallback = '1';
+          img.src = 'https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg';
+        };
+
+        var pl = document.createElement('span'); pl.className = 'pl';
+        var ov = document.createElement('span'); ov.className = 'ov';
+        ov.textContent = v.title;           /* textContent: titles are untrusted */
+
+        a.appendChild(img); a.appendChild(pl); a.appendChild(ov);
+        wrap.appendChild(a);
+      });
+
+      wrap.hidden = false;
+      var fb = document.getElementById('bossThumbFallback');
+      if(fb) fb.style.display = 'none';
+    }).catch(function(){ /* keep the static thumbnail */ });
   })();
 </script>
 
