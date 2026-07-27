@@ -19,8 +19,28 @@ echo
 
 read -r  -p "SMTP login: " SMTP_LOGIN
 read -rs -p "SMTP key (hidden): " SMTP_KEY; echo
-read -r  -p "Send emails from [noreply@complaint.website]: " FROM_ADDR
+
+echo
+echo "The FROM address must be on a domain authenticated with Brevo."
+echo "DMARC is checked against this domain, so a gmail.com / yahoo.com"
+echo "address here fails alignment and gets filtered as spoofing."
+read -r  -p "Send emails FROM [noreply@complaint.website]: " FROM_ADDR
 FROM_ADDR="${FROM_ADDR:-noreply@complaint.website}"
+
+case "$FROM_ADDR" in
+  *@gmail.com|*@googlemail.com|*@yahoo.com|*@outlook.com|*@hotmail.com)
+    echo
+    echo "⚠️  '$FROM_ADDR' is a free-mail address. Verification codes sent from it"
+    echo "    will fail DMARC and are likely to land in spam."
+    read -r -p "    Use it anyway? [y/N]: " CONFIRM
+    [ "$CONFIRM" = "y" ] || [ "$CONFIRM" = "Y" ] || { echo "Aborted — nothing changed."; exit 1; }
+    ;;
+esac
+
+echo
+echo "Replies go here. complaint.website has no MX record, so without this a"
+echo "customer hitting Reply gets a bounce. Blank = no Reply-To header."
+read -r  -p "Reply-To address [none]: " REPLY_ADDR
 
 [ -n "$SMTP_LOGIN" ] && [ -n "$SMTP_KEY" ] || { echo "Login and key are both required."; exit 1; }
 
@@ -49,6 +69,7 @@ set_var SMTP_SECURE "false"
 set_var SMTP_USER   "$SMTP_LOGIN"
 set_var SMTP_PASS   "$SMTP_KEY"
 set_var MAIL_FROM   "complaint.website <${FROM_ADDR}>"
+set_var MAIL_REPLY_TO "${REPLY_ADDR}"
 set_var RESEND_API_KEY ""   # keep empty so the SMTP path is the one used
 
 chmod 600 "$ENV_FILE"

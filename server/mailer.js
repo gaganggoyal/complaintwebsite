@@ -48,14 +48,17 @@ function otpEmailHtml(name, otp) {
 }
 
 // Resend's HTTP API. Node 18+ has global fetch, so this needs no new dependency.
-async function sendViaResend({ from, to, subject, text, html }) {
+async function sendViaResend({ from, to, subject, text, html, replyTo }) {
+  const payload = { from, to: [to], subject, text, html };
+  if (replyTo) payload.reply_to = replyTo;
+
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${resendKey}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ from, to: [to], subject, text, html })
+    body: JSON.stringify(payload)
   });
 
   if (!res.ok) {
@@ -72,7 +75,12 @@ async function sendViaResend({ from, to, subject, text, html }) {
 }
 
 async function sendOtpEmail(to, name, otp) {
+  // MAIL_FROM must stay on a domain you have authenticated with the provider —
+  // DMARC is evaluated against the From domain, so a free-mail address here
+  // (gmail.com etc.) fails alignment and gets filtered as spoofing.
+  // Use MAIL_REPLY_TO to route replies to an inbox you actually read.
   const from = process.env.MAIL_FROM || process.env.SMTP_USER || 'no-reply@complaint.website';
+  const replyTo = process.env.MAIL_REPLY_TO || '';
   const subject = 'Your complaint.website verification code';
   const text =
     `Hi ${name || 'there'},\n\n` +
@@ -81,10 +89,12 @@ async function sendOtpEmail(to, name, otp) {
     `— complaint.website (An IndiaOffers.in Company)`;
   const html = otpEmailHtml(name, otp);
 
-  if (hasResend) return sendViaResend({ from, to, subject, text, html });
+  if (hasResend) return sendViaResend({ from, to, subject, text, html, replyTo });
 
   if (transporter) {
-    await transporter.sendMail({ from, to, subject, text, html });
+    const msg = { from, to, subject, text, html };
+    if (replyTo) msg.replyTo = replyTo;
+    await transporter.sendMail(msg);
     return { devMode: false };
   }
 
