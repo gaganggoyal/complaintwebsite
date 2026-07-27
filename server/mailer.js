@@ -7,6 +7,7 @@
 //
 // Mode 3 lets the whole flow be tested before email is configured.
 const nodemailer = require('nodemailer');
+const { otpEmail, welcomeEmail, activatedEmail } = require('./emails');
 
 const resendKey = process.env.RESEND_API_KEY || '';
 const hasResend = !!resendKey;
@@ -30,21 +31,6 @@ if (!hasResend && hasSmtp) {
     requireTLS: !secure,
     auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
   });
-}
-
-function otpEmailHtml(name, otp) {
-  return `
-  <div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#26343d">
-    <div style="text-align:center;margin-bottom:18px">
-      <span style="display:inline-block;background:linear-gradient(135deg,#ff7f3f,#ec5f22);color:#fff;font-weight:800;font-size:18px;padding:10px 16px;border-radius:12px">complaint.website</span>
-      <div style="font-size:11px;color:#627480;margin-top:6px;letter-spacing:.5px">AN INDIAOFFERS.IN COMPANY</div>
-    </div>
-    <p style="font-size:15px">Hi ${name || 'there'},</p>
-    <p style="font-size:15px">Your verification code is:</p>
-    <div style="font-size:34px;font-weight:800;letter-spacing:8px;text-align:center;color:#1c3d4d;background:#fdf6ee;border:1px solid #efe3d5;border-radius:14px;padding:18px 0;margin:14px 0">${otp}</div>
-    <p style="font-size:14px;color:#627480">This code is valid for 10 minutes. If you did not request it, you can safely ignore this email.</p>
-    <p style="font-size:13px;color:#9aa7b1;margin-top:22px">— complaint.website · An IndiaOffers.in Company</p>
-  </div>`;
 }
 
 // Resend's HTTP API. Node 18+ has global fetch, so this needs no new dependency.
@@ -74,20 +60,16 @@ async function sendViaResend({ from, to, subject, text, html, replyTo }) {
   return { devMode: false };
 }
 
-async function sendOtpEmail(to, name, otp) {
+// Single delivery path for every template.
+// `devLine` is what gets printed instead of sending when email is unconfigured.
+async function send(to, tpl, devLine) {
   // MAIL_FROM must stay on a domain you have authenticated with the provider —
   // DMARC is evaluated against the From domain, so a free-mail address here
   // (gmail.com etc.) fails alignment and gets filtered as spoofing.
   // Use MAIL_REPLY_TO to route replies to an inbox you actually read.
   const from = process.env.MAIL_FROM || process.env.SMTP_USER || 'no-reply@complaint.website';
   const replyTo = process.env.MAIL_REPLY_TO || '';
-  const subject = 'Your complaint.website verification code';
-  const text =
-    `Hi ${name || 'there'},\n\n` +
-    `Your verification code is: ${otp}\n\n` +
-    `It is valid for 10 minutes. If you did not request this, ignore this email.\n\n` +
-    `— complaint.website (An IndiaOffers.in Company)`;
-  const html = otpEmailHtml(name, otp);
+  const { subject, text, html } = tpl;
 
   if (hasResend) return sendViaResend({ from, to, subject, text, html, replyTo });
 
@@ -99,10 +81,42 @@ async function sendOtpEmail(to, name, otp) {
   }
 
   console.log('\n================ DEV MODE — EMAIL NOT CONFIGURED ================');
-  console.log(`  OTP for ${to}: ${otp}`);
+  console.log(`  ${devLine}`);
   console.log('  (Set RESEND_API_KEY or SMTP_* in server/.env to send real emails.)');
   console.log('================================================================\n');
   return { devMode: true };
 }
 
-module.exports = { sendOtpEmail, hasSmtp, hasEmail, mode };
+const WA_NUMBER = process.env.WA_NUMBER || '919569608101';
+
+function waLinkFor(name, email, phone, planLabel, planPrice, kind) {
+  const msg = kind === 'activated'
+    ? `Namaste! I am ${name} (${email}). My ${planLabel} plan is active — I would like to start my complaint.`
+    : `Namaste! I registered on complaint.website as ${name} (${email}), WhatsApp ${phone}. ` +
+      `I chose the ${planLabel} (${planPrice}) plan and want to pay and activate it.`;
+  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+}
+
+function sendOtpEmail(to, name, otp) {
+  return send(to, otpEmail({ name, otp }), `OTP for ${to}: ${otp}`);
+}
+
+// Sent once the email address is confirmed — carries the plan and the
+// WhatsApp link used to pay.
+function sendWelcomeEmail(user, planLabel, planPrice) {
+  const waLink = waLinkFor(user.name, user.email, user.phone, planLabel, planPrice, 'welcome');
+  return send(user.email, welcomeEmail({ name: user.name, planLabel, planPrice, waLink }),
+    `Welcome email for ${user.email} (${planLabel})`);
+}
+
+// Sent when the plan is switched to active in the admin panel.
+function sendActivatedEmail(user, planLabel, planPrice) {
+  const waLink = waLinkFor(user.name, user.email, user.phone, planLabel, planPrice, 'activated');
+  return send(user.email, activatedEmail({ name: user.name, planLabel, planPrice, waLink }),
+    `Activation email for ${user.email} (${planLabel})`);
+}
+
+module.exports = {
+  sendOtpEmail, sendWelcomeEmail, sendActivatedEmail,
+  hasSmtp, hasEmail, mode
+};

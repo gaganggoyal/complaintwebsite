@@ -1,18 +1,31 @@
 #!/usr/bin/env node
-// Send a real verification-style email to prove the mail setup works.
+// Send a real email to prove the mail setup works.
 //
-//   node test-mail.js you@example.com
+//   node test-mail.js you@example.com [otp|welcome|activated|all]
 //
 // Reports the provider's own error on failure — that message names the actual
 // problem (unverified sender, wrong key, blocked port), which is otherwise
 // very hard to guess from inside the app.
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
-const { sendOtpEmail, mode } = require('./mailer');
+const { sendOtpEmail, sendWelcomeEmail, sendActivatedEmail, mode } = require('./mailer');
 
 const to = process.argv[2];
+const which = (process.argv[3] || 'otp').toLowerCase();
 if (!to) {
-  console.error('Usage: node test-mail.js you@example.com');
+  console.error('Usage: node test-mail.js you@example.com [otp|welcome|activated|all]');
+  process.exit(1);
+}
+
+const sampleUser = { name: 'Asha Kumari', email: to, phone: '9876543210' };
+const senders = {
+  otp:       () => sendOtpEmail(to, sampleUser.name, '482913'),
+  welcome:   () => sendWelcomeEmail(sampleUser, 'Annual Membership', '₹999'),
+  activated: () => sendActivatedEmail(sampleUser, 'Annual Membership', '₹999')
+};
+const plan = which === 'all' ? Object.keys(senders) : [which];
+if (plan.some((p) => !senders[p])) {
+  console.error(`Unknown template "${which}". Use: otp | welcome | activated | all`);
   process.exit(1);
 }
 
@@ -27,11 +40,14 @@ if (!to) {
     process.exit(1);
   }
 
-  console.log('\nsending…');
+  console.log(`\nsending: ${plan.join(', ')}`);
   try {
-    await sendOtpEmail(to, 'Test', '123456');
-    console.log('✅ Sent. Check the inbox (and the spam folder).');
-    console.log('   If it landed in spam, the domain still needs SPF/DKIM in DNS.');
+    for (const p of plan) {
+      await senders[p]();
+      console.log(`  ✅ ${p}`);
+    }
+    console.log('\nSent. Check the inbox (and the spam folder).');
+    console.log('If it landed in spam, the domain still needs SPF/DKIM in DNS.');
   } catch (e) {
     console.error('\n❌ Failed:', e && e.message ? e.message : e);
     console.error('\nCommon causes:');

@@ -12,7 +12,10 @@ const rateLimit = require('express-rate-limit');
 const SqliteStore = require('better-sqlite3-session-store')(session);
 
 const db = require('./db');
-const { sendOtpEmail, hasEmail, mode: mailMode } = require('./mailer');
+const {
+  sendOtpEmail, sendWelcomeEmail, sendActivatedEmail,
+  hasEmail, mode: mailMode
+} = require('./mailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -174,6 +177,13 @@ app.post('/api/verify', otpLimiter, async (req, res) => {
 
     db.markVerified(email, Date.now());
     await signIn(req, user.id);
+
+    // Welcome mail is a nice-to-have: never let a mail failure block the
+    // verification the customer just completed.
+    const plan = PLANS[user.plan] || { label: user.plan, price: '' };
+    sendWelcomeEmail(user, plan.label, plan.price)
+      .catch((e) => console.error('welcome email failed:', e && e.message));
+
     return res.json({ ok: true });
   } catch (e) {
     console.error('verify error:', e);
@@ -340,6 +350,15 @@ app.post('/api/admin/status', requireAdmin, (req, res) => {
 
   db.setStatus(id, status, status === 'active' ? Date.now() : null);
   console.log(`admin: ${user.email} -> ${status}`);
+
+  // Only on the pending -> active transition, so re-clicking Active does not
+  // email the customer twice. Never blocks the admin action.
+  if (status === 'active' && user.plan_status !== 'active') {
+    const plan = PLANS[user.plan] || { label: user.plan, price: '' };
+    sendActivatedEmail(user, plan.label, plan.price)
+      .catch((e) => console.error('activation email failed:', e && e.message));
+  }
+
   res.json({ ok: true });
 });
 
