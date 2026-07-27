@@ -97,8 +97,9 @@ function waLinkFor(name, email, phone, planLabel, planPrice, kind) {
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
 }
 
-function sendOtpEmail(to, name, otp) {
-  return send(to, otpEmail({ name, otp }), `OTP for ${to}: ${otp}`);
+function sendOtpEmail(to, name, otp, verifyLink) {
+  return send(to, otpEmail({ name, otp, verifyLink }),
+    `OTP for ${to}: ${otp}${verifyLink ? `\n  One-click link: ${verifyLink}` : ''}`);
 }
 
 // Sent once the email address is confirmed — carries the plan and the

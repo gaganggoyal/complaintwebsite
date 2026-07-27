@@ -30,7 +30,27 @@
 </header>
 
 <main class="auth-wrap">
-  <div class="auth-card">
+  <!-- Shown only when arriving from the one-click link in the email. -->
+  <div id="linkCard" class="auth-card" style="display:none">
+    <div class="auth-head">
+      <h1 class="l-en">Confirming your email…</h1><h1 class="l-hi">आपका ईमेल confirm हो रहा है…</h1>
+      <p class="l-en">This takes a second.</p><p class="l-hi">बस एक पल।</p>
+    </div>
+    <div id="linkAlert" class="alert"></div>
+    <!-- Fallback when JavaScript is unavailable, and the retry target on failure. -->
+    <noscript>
+      <p class="l-en">Please press the button below to confirm your email.</p>
+      <p class="l-hi">अपना ईमेल confirm करने के लिए नीचे बटन दबाइए।</p>
+    </noscript>
+    <button id="linkConfirmBtn" type="button" class="btn btn-cta" style="display:none">
+      <span class="l-en">Confirm my email</span><span class="l-hi">मेरा ईमेल confirm कीजिए</span>
+    </button>
+    <div class="alt-link" style="margin-top:14px">
+      <a id="linkUseCode" href="#"><span class="l-en">Enter the 6-digit code instead</span><span class="l-hi">इसके बजाय 6 अंकों का code डालिए</span></a>
+    </div>
+  </div>
+
+  <div id="codeCard" class="auth-card">
     <div class="auth-head">
       <h1 class="l-en">Verify your email</h1><h1 class="l-hi">अपना ईमेल verify कीजिए</h1>
       <p class="l-en">We sent a 6-digit code to</p><p class="l-hi">हमने 6 अंकों का code भेजा है —</p>

@@ -155,17 +155,38 @@ function layout({ preheader, heading, headingHi, body }) {
 }
 
 // ---------------------------------------------------------------- OTP code
-function otpEmail({ name, otp }) {
-  const body = `
-    <p style="margin:22px 0 0;font-family:${FONT};font-size:15.5px;line-height:1.65;color:${BRAND.ink}">
-      Hi ${esc(name) || 'there'}, use this code to verify your email address:
+function otpEmail({ name, otp, verifyLink }) {
+  // One tap is the happy path; the code stays for anyone whose mail client
+  // strips links, or who opened the mail on a different device.
+  const oneClick = verifyLink ? `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:26px 0 0">
+      <tr><td align="center">${button(verifyLink, 'Confirm my email &nbsp;→', BRAND.saffronDark)}</td></tr>
+    </table>
+
+    <p style="margin:14px 0 0;font-family:${FONT};font-size:13.5px;line-height:1.6;color:${BRAND.muted};text-align:center">
+      एक क्लिक में confirm कीजिए
     </p>
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:22px 0 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:28px 0 4px">
+      <tr>
+        <td width="42%" style="border-bottom:1px solid ${BRAND.line};font-size:0;line-height:0">&nbsp;</td>
+        <td align="center" style="font-family:${FONT};font-size:11px;font-weight:700;color:${BRAND.muted};letter-spacing:1.2px;padding:0 10px">OR</td>
+        <td width="42%" style="border-bottom:1px solid ${BRAND.line};font-size:0;line-height:0">&nbsp;</td>
+      </tr>
+    </table>` : '';
+
+  const body = `
+    <p style="margin:22px 0 0;font-family:${FONT};font-size:15.5px;line-height:1.65;color:${BRAND.ink}">
+      Hi ${esc(name) || 'there'}, confirm your email address to continue.
+    </p>
+
+    ${oneClick}
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:20px 0 0">
       <tr>
         <td align="center" style="background-color:${BRAND.tint};border:1px solid ${BRAND.line};border-radius:16px;padding:26px 16px">
           <div style="font-family:${FONT};font-size:11px;font-weight:700;color:${BRAND.muted};letter-spacing:1.4px;text-transform:uppercase">
-            Verification code
+            ${verifyLink ? 'Or enter this code' : 'Verification code'}
           </div>
           <div style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:40px;font-weight:800;color:${BRAND.navy};letter-spacing:11px;line-height:1.25;padding:10px 0 0;text-indent:11px">
             ${esc(otp)}
@@ -178,7 +199,7 @@ function otpEmail({ name, otp }) {
     </table>
 
     <p style="margin:22px 0 0;font-family:${FONT};font-size:14.5px;line-height:1.65;color:${BRAND.muted}">
-      अपना ईमेल verify करने के लिए यह code डालिए। यह 10 मिनट के लिए मान्य है।
+      ऊपर बटन दबाइए, या यह code डालिए। यह 10 मिनट के लिए मान्य है।
     </p>
 
     <p style="margin:20px 0 0;font-family:${FONT};font-size:13.5px;line-height:1.65;color:${BRAND.muted}">
@@ -196,7 +217,8 @@ function otpEmail({ name, otp }) {
     }),
     text:
       `Hi ${name || 'there'},\n\n` +
-      `Your complaint.website verification code is: ${otp}\n\n` +
+      (verifyLink ? `Confirm your email in one click:\n${verifyLink}\n\nOr enter this code: ${otp}\n\n`
+                  : `Your complaint.website verification code is: ${otp}\n\n`) +
       `It is valid for 10 minutes.\n\n` +
       `If you did not request this, ignore this email.\n\n` +
       `We never ask for your OTP, PIN, card number or bank password.\n\n` +

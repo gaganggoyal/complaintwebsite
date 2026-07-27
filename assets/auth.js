@@ -97,6 +97,63 @@
     });
   }
 
+  // ============ ONE-CLICK CONFIRM (from the email link) ============
+  // The token arrives as ?token=… . We confirm it with a POST rather than
+  // letting the link itself be the confirmation, because mail scanners and
+  // link-preview bots follow URLs but do not run JavaScript — a GET route
+  // would let them burn the single-use token before the customer clicks.
+  var linkCard = $('linkCard');
+  if (linkCard) {
+    var token = qs('token') || '';
+    var linkAlert = $('linkAlert');
+    var confirmBtn = $('linkConfirmBtn');
+
+    if (token) {
+      $('codeCard').style.display = 'none';
+      linkCard.style.display = '';
+
+      var confirming = false;
+      var confirm = async function () {
+        if (confirming) return;
+        confirming = true;
+        hideAlert(linkAlert);
+        confirmBtn.style.display = 'none';
+
+        var out = await postJSON('/api/verify-link', { token: token });
+        confirming = false;
+
+        if (out.ok && out.data.ok) {
+          window.location.replace('dashboard.html');
+          return;
+        }
+
+        // The token is single-use, so pressing the same link twice lands here.
+        // If they are already signed in from the first click, that is a
+        // success, not an error — send them on to the dashboard.
+        try {
+          var me = await fetch('/api/me', { headers: { 'Accept': 'application/json' } });
+          if (me.ok) { window.location.replace('dashboard.html'); return; }
+        } catch (e) { /* offline — fall through to the code form */ }
+
+        // Expired or already-used link: fall back to the code, which the
+        // same email always carries.
+        showAlert(linkAlert, out.data.error ||
+          (isHi() ? 'यह link काम नहीं कर रहा। कृपया code डालिए।'
+                  : 'This link did not work. Please enter the code instead.'));
+        confirmBtn.style.display = '';
+      };
+
+      confirmBtn.addEventListener('click', confirm);
+      confirm();
+
+      $('linkUseCode').addEventListener('click', function (e) {
+        e.preventDefault();
+        linkCard.style.display = 'none';
+        $('codeCard').style.display = '';
+      });
+    }
+  }
+
   // ================= VERIFY =================
   var verForm = $('verifyForm');
   if (verForm) {

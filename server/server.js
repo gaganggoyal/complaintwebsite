@@ -34,6 +34,18 @@ const MAX_OTP_ATTEMPTS = 5;
 
 // ---------- helpers ----------
 const genOtp = () => String(crypto.randomInt(100000, 1000000)); // 6 digits
+
+// One-click confirmation link. 256 bits of entropy; only its sha256 is stored.
+const APP_URL = (process.env.APP_URL || 'https://complaint.website').replace(/\/+$/, '');
+const genToken = () => crypto.randomBytes(32).toString('hex');
+const hashToken = (t) => crypto.createHash('sha256').update(String(t)).digest('hex');
+
+// Issue a fresh confirmation token for an email and return the full link.
+function issueVerifyLink(email, expires) {
+  const token = genToken();
+  db.setVerifyToken(email, hashToken(token), expires);
+  return `${APP_URL}/verify?token=${token}`;
+}
 const validEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const validPhone = (p) => /^[0-9+\-\s]{7,15}$/.test(p);
 const cleanEmail = (e) => (e || '').trim().toLowerCase();
@@ -138,7 +150,7 @@ app.post('/api/register', authLimiter, async (req, res) => {
     // instead of returning an opaque 500.
     let result;
     try {
-      result = await sendOtpEmail(email, name, otp);
+      result = await sendOtpEmail(email, name, otp, issueVerifyLink(email, now + OTP_TTL));
     } catch (mailErr) {
       console.error('register: email delivery failed:', mailErr);
       return res.status(502).json({ error: 'We could not send the verification email just now. Please try again in a moment.' });
@@ -191,6 +203,40 @@ app.post('/api/verify', otpLimiter, async (req, res) => {
   }
 });
 
+// One-click confirmation from the emailed link.
+//
+// Deliberately a POST, even though it arrives from a link: mail scanners and
+// link-preview bots follow URLs in email but do not run JavaScript, so a GET
+// route here would let them burn the single-use token — and hand them the
+// session — before the customer ever clicks. The verify page fetches this.
+app.post('/api/verify-link', otpLimiter, async (req, res) => {
+  try {
+    const token = ((req.body && req.body.token) || '').trim();
+    if (!token) return res.status(400).json({ error: 'Missing confirmation token.' });
+
+    const user = db.getUserByVerifyToken(hashToken(token));
+    if (!user) {
+      return res.status(400).json({ error: 'This confirmation link is not valid. Please enter the code instead.' });
+    }
+
+    if (!user.verify_token_expires || Date.now() > user.verify_token_expires) {
+      return res.status(400).json({ error: 'This confirmation link has expired. Please request a new code.' });
+    }
+
+    db.markVerified(user.email, Date.now());   // also clears the token: single use
+    await signIn(req, user.id);
+
+    const plan = PLANS[user.plan] || { label: user.plan, price: '' };
+    sendWelcomeEmail(user, plan.label, plan.price)
+      .catch((e) => console.error('welcome email failed:', e && e.message));
+
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error('verify-link error:', e);
+    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
+});
+
 // Resend a fresh OTP (with a short cooldown).
 app.post('/api/resend', otpLimiter, async (req, res) => {
   try {
@@ -209,7 +255,7 @@ app.post('/api/resend', otpLimiter, async (req, res) => {
 
     let result;
     try {
-      result = await sendOtpEmail(email, user.name, otp);
+      result = await sendOtpEmail(email, user.name, otp, issueVerifyLink(email, now + OTP_TTL));
     } catch (mailErr) {
       console.error('resend: email delivery failed:', mailErr);
       return res.status(502).json({ error: 'We could not send the email just now. Please try again in a moment.' });
@@ -240,7 +286,7 @@ app.post('/api/login', authLimiter, async (req, res) => {
       db.setOtp(email, otpHash, now + OTP_TTL, now);
       let result = {};
       try {
-        result = await sendOtpEmail(email, user.name, otp);
+        result = await sendOtpEmail(email, user.name, otp, issueVerifyLink(email, now + OTP_TTL));
       } catch (mailErr) {
         // Still send them to the verify page — "resend" there is the retry.
         console.error('login: email delivery failed:', mailErr);

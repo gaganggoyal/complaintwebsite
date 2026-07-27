@@ -35,6 +35,13 @@ CREATE TABLE IF NOT EXISTS users (
 const cols = new Set(db.prepare('PRAGMA table_info(users)').all().map((c) => c.name));
 if (!cols.has('activated_at')) db.exec('ALTER TABLE users ADD COLUMN activated_at INTEGER');
 if (!cols.has('admin_note')) db.exec('ALTER TABLE users ADD COLUMN admin_note TEXT');
+// One-click email confirmation. Stores sha256 of the token, never the token
+// itself, so a leaked database cannot be used to confirm anyone's address.
+// sha256 (not bcrypt) is right here: the token is 256 bits of entropy, so
+// there is nothing to brute-force, and it lets us look the row up by hash.
+if (!cols.has('verify_token')) db.exec('ALTER TABLE users ADD COLUMN verify_token TEXT');
+if (!cols.has('verify_token_expires')) db.exec('ALTER TABLE users ADD COLUMN verify_token_expires INTEGER');
+db.exec('CREATE INDEX IF NOT EXISTS idx_users_verify_token ON users(verify_token)');
 
 const q = {
   byEmail: db.prepare('SELECT * FROM users WHERE email = ?'),
@@ -48,7 +55,11 @@ const q = {
     WHERE email = @email`),
   setOtp: db.prepare('UPDATE users SET otp_hash = ?, otp_expires = ?, otp_last_sent = ?, otp_attempts = 0 WHERE email = ?'),
   incAttempts: db.prepare('UPDATE users SET otp_attempts = otp_attempts + 1 WHERE email = ?'),
-  markVerified: db.prepare('UPDATE users SET email_verified = 1, otp_hash = NULL, otp_expires = NULL, otp_attempts = 0, verified_at = ? WHERE email = ?'),
+  markVerified: db.prepare(`UPDATE users SET email_verified = 1, otp_hash = NULL, otp_expires = NULL,
+    otp_attempts = 0, verify_token = NULL, verify_token_expires = NULL, verified_at = ? WHERE email = ?`),
+
+  byVerifyToken: db.prepare('SELECT * FROM users WHERE verify_token = ?'),
+  setVerifyToken: db.prepare('UPDATE users SET verify_token = ?, verify_token_expires = ? WHERE email = ?'),
 
   // --- admin ---
   // otp_hash / password_hash are deliberately never selected here.
@@ -75,6 +86,8 @@ module.exports = {
   setOtp: (email, hash, expires, lastSent) => q.setOtp.run(hash, expires, lastSent, email),
   incOtpAttempts: (email) => q.incAttempts.run(email),
   markVerified: (email, ts) => q.markVerified.run(ts, email),
+  getUserByVerifyToken: (tokenHash) => q.byVerifyToken.get(tokenHash),
+  setVerifyToken: (email, tokenHash, expires) => q.setVerifyToken.run(tokenHash, expires, email),
 
   // --- admin ---
   listUsers: (limit, offset) => q.listUsers.all(limit, offset),
